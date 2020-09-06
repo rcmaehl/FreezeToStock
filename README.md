@@ -15,3 +15,12 @@ And it's not just limited to Windows 10 apps, but to almost all processes. Micro
 So far results have been promising on my 4 year old Windows 10 install (Yes, that is about 40+ chrome tabs open and suspended):
 
 ![](https://i.imgur.com/LilskjJ.png)
+
+### How do I use it?
+
+1. Visit the [Releases page](https://github.com/rcmaehl/FreezeToStock/releases)
+2. Download FTS.exe (**NOTE:** Only a 64-bit version is currently available)
+3. Select any Exclusions you need in the Exclusions menu
+4. Select **Freeze System**
+5. Launch your game
+6. Once done gaming, select **Unfreeze System**
