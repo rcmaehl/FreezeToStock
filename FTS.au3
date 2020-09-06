@@ -12,6 +12,7 @@
 #Au3Stripper_Parameters=/pe /so
 #EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
 
+; Included in AutoIt
 #include <Array.au3>
 #include <GUIStatusBar.au3>
 #include <EditConstants.au3>
@@ -19,6 +20,9 @@
 #include <ButtonConstants.au3>
 #include <StringConstants.au3>
 #include <WindowsConstants.au3>
+
+; Manual Includes
+#include ".\Includes\Services.au3"
 
 Main()
 
@@ -537,7 +541,7 @@ Func _FreezeToStock($aProcessExclusions, $aServicesExclusions, $bAggressive, $hO
 						_ServiceStop($aServices[$iLoop1][0])
 					Else
 						_GUICtrlStatusBar_SetText($hOutput, $iLoop0 + 1 & "/3 Service: " & $aServices[$iLoop1][0], 1)
-						_ServiceSuspend($aServices[$iLoop1][0])
+						_ServicePause($aServices[$iLoop1][0])
 					EndIf
 					Sleep(100)
 				Else
@@ -555,6 +559,30 @@ EndFunc
 Func _IsChecked($idControlID)
     Return BitAND(GUICtrlRead($idControlID), $GUI_CHECKED) = $GUI_CHECKED
 EndFunc   ;==>_IsChecked
+
+Func _ProcessSuspend($iPID)
+	$ai_Handle = DllCall("kernel32.dll", 'int', 'OpenProcess', 'int', 0x1f0fff, 'int', False, 'int', $iPID)
+	$i_success = DllCall("ntdll.dll", "int", "NtSuspendProcess", "int", $ai_Handle[0])
+	DllCall('kernel32.dll', 'ptr', 'CloseHandle', 'ptr', $ai_Handle)
+	If IsArray($i_success) Then
+		Return 1
+	Else
+		SetError(1)
+		Return 0
+	EndIf
+EndFunc
+
+Func _ProcessResume($iPID)
+	$ai_Handle = DllCall("kernel32.dll", 'int', 'OpenProcess', 'int', 0x1f0fff, 'int', False, 'int', $iPID)
+	$i_success = DllCall("ntdll.dll", "int", "NtResumeProcess", "int", $ai_Handle[0])
+	DllCall('kernel32.dll', 'ptr', 'CloseHandle', 'ptr', $ai_Handle)
+	If IsArray($i_success) Then
+		Return 1
+	Else
+		SetError(1)
+		Return 0
+	EndIf
+EndFunc
 
 ; #FUNCTION# ====================================================================================================================
 ; Name ..........: _ServicesList
@@ -625,7 +653,7 @@ Func _ThawFromStock($aProcessExclusions, $aServicesSnapshot, $bAggressive = Fals
 					_ServiceStart($aServicesSnapshot[$iLoop1][0])
 				Else
 					_GUICtrlStatusBar_SetText($hOutput, $iLoop0 + 1 & "/3 Service: " & $aServicesSnapshot[$iLoop1][0], 1)
-					_ServiceResume($aServicesSnapshot[$iLoop1][0])
+					_ServiceContinue($aServicesSnapshot[$iLoop1][0])
 				EndIf
 				Sleep(100)
 			Else
@@ -637,48 +665,4 @@ Func _ThawFromStock($aProcessExclusions, $aServicesSnapshot, $bAggressive = Fals
 	_GUICtrlStatusBar_SetText($hOutput, "", 0)
 	_GUICtrlStatusBar_SetText($hOutput, "", 1)
 
-EndFunc
-
-Func _ProcessSuspend($iPID)
-	$ai_Handle = DllCall("kernel32.dll", 'int', 'OpenProcess', 'int', 0x1f0fff, 'int', False, 'int', $iPID)
-	$i_success = DllCall("ntdll.dll","int","NtSuspendProcess","int",$ai_Handle[0])
-	DllCall('kernel32.dll', 'ptr', 'CloseHandle', 'ptr', $ai_Handle)
-	If IsArray($i_success) Then
-		Return 1
-	Else
-		SetError(1)
-		Return 0
-	EndIf
-EndFunc
-
-Func _ProcessResume($iPID)
-	$ai_Handle = DllCall("kernel32.dll", 'int', 'OpenProcess', 'int', 0x1f0fff, 'int', False, 'int', $iPID)
-	$i_success = DllCall("ntdll.dll","int","NtResumeProcess","int",$ai_Handle[0])
-	DllCall('kernel32.dll', 'ptr', 'CloseHandle', 'ptr', $ai_Handle)
-	If IsArray($i_success) Then
-		Return 1
-	Else
-		SetError(1)
-		Return 0
-	EndIf
-EndFunc
-
-Func _ServiceResume($sService)
-	If StringInStr($sService, " ") Then $sService = '"' & $sService & '"'
-	Run("sc \\localhost continue " & $sService, "", @SW_HIDE)
-EndFunc
-
-Func _ServiceStart($sService)
-	If StringInStr($sService, " ") Then $sService = '"' & $sService & '"'
-	Run("sc \\localhost start " & $sService, "", @SW_HIDE)
-EndFunc
-
-Func _ServiceStop($sService)
-	If StringInStr($sService, " ") Then $sService = '"' & $sService & '"'
-	Run("sc \\localhost stop " & $sService, "", @SW_HIDE)
-EndFunc
-
-Func _ServiceSuspend($sService)
-	If StringInStr($sService, " ") Then $sService = '"' & $sService & '"'
-	Run("sc \\localhost pause " & $sService, "", @SW_HIDE)
 EndFunc
