@@ -4,7 +4,8 @@
 #AutoIt3Wrapper_Icon=.\icon.ico
 #AutoIt3Wrapper_UseX64=y
 #AutoIt3Wrapper_Res_Description=Freeze To Stock
-#AutoIt3Wrapper_Res_Fileversion=0.1
+#AutoIt3Wrapper_Res_Fileversion=1.0
+#AutoIt3Wrapper_Res_ProductVersion=1.0
 #AutoIt3Wrapper_Res_LegalCopyright=Robert Maehl, using LGPL 3 License
 #AutoIt3Wrapper_Res_Language=1033
 #AutoIt3Wrapper_Res_requestedExecutionLevel=highestAvailable
@@ -13,11 +14,15 @@
 #EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
 
 ; Included in AutoIt
+#include <File.au3>
+#include <Misc.au3>
 #include <Array.au3>
+#include <String.au3>
 #include <GUIStatusBar.au3>
 #include <EditConstants.au3>
 #include <GUIConstantsEx.au3>
 #include <ButtonConstants.au3>
+#include <MsgBoxConstants.au3>
 #include <StringConstants.au3>
 #include <WindowsConstants.au3>
 
@@ -28,9 +33,13 @@ Main()
 
 Func Main()
 
+	Local $sVersion = "1.0"
+
 	Local $aStatusSize[2] = [75, -1]
 
 	Local $bSuspended = False
+
+	Local $aAfter, $aBefore, $aFinal[0]
 
 	Local $aProcessExclusions[0] = []
 	Local $aServicesExclusions[0]
@@ -76,16 +85,27 @@ Func Main()
 			Local $hSteamVR = GUICtrlCreateMenuItem("SteamVR (+ HTC)", $hVirtualR)
 			Local $hWinMR = GUICtrlCreateMenuItem("Windows Mixed Reality", $hVirtualR)
 		GUICtrlCreateMenuItem("", $hExclude)
-		Local $hAddCustom = GUICtrlCreateMenuItem("Add Custom", $hExclude)
-		Local $hRemCustom = GUICtrlCreateMenuItem("Remove Custom", $hExclude)
+		Local $hCustom = GUICtrlCreateMenu("Custom", $hExclude)
+			Local $hAddCustom = GUICtrlCreateMenuItem("Add Custom", $hCustom)
+			;Local $hNewCustom = GUICtrlCreateMenuItem("Create Custom", $hCustom)
+			Local $hRemCustom = GUICtrlCreateMenuItem("Remove Custom", $hCustom)
+
+	Local $hHelp = GUICtrlCreateMenu("Help")
+	Local $hGithub = GUICtrlCreateMenuItem("Github", $hHelp)
+	Local $hDiscord = GUICtrlCreateMenuItem("Discord", $hHelp)
+		GUICtrlSetState(-1, $GUI_DISABLE)
+	GUICtrlCreateMenuItem("", $hHelp)
+	Local $hDonate = GUICtrlCreateMenuItem("Donate", $hHelp)
+	GUICtrlCreateMenuItem("", $hHelp)
+	Local $hUpdate = GUICtrlCreateMenuItem("Update", $hHelp)
 
 	GUICtrlCreateGroup("Options", 5, 5, 310, 190)
 		Local $hToggle = GUICtrlCreateButton(" FREEZE SYSTEM", 10, 20, 300, 60)
 			GUICtrlSetFont(-1, 20)
 			GUICtrlSetImage(-1, ".\Includes\freeze_small.ico", -1, 0)
 
-		Local $hAggressive = GUICtrlCreateCheckbox("Stop Services instead of just Pausing", 12, 85, 300, 20)
-			GUICtrlSetTip(-1, "This is recommended for more users with more extreme resource needs")
+		Local $hAggressive = GUICtrlCreateCheckbox("Pause Services instead of Stopping", 12, 85, 300, 20)
+			GUICtrlSetTip(-1, "Very few Services allow Pausing, but still gives some results")
 
 	$hStatus = _GUICtrlStatusBar_Create($hGUI, $aStatusSize)
 	GUISetState(@SW_SHOW, $hGUI)
@@ -347,21 +367,97 @@ Func Main()
 					EndSwitch
 				EndIf
 
+			Case $hAddCustom
+				$hFile = FileOpenDialog("Select Definition File to Load", @WorkingDir, "Exclusions Definition (*.def)", $FD_FILEMUSTEXIST, "exclusion.def", $hGUI)
+				If @error Then
+					;;;
+				Else
+					_LoadCustom($hFile, $aProcessExclusions, $aServicesExclusions)
+					_ArrayDisplay($aProcessExclusions)
+					_ArrayDisplay($aServicesExclusions)
+				EndIf
+
+#cs
+			Case $hNewCustom
+				$aFinal = StringSplit("", ",", $STR_NOCOUNT)
+				_ArrayDelete($aFinal, 0)
+				If MsgBox($MB_OKCANCEL+$MB_ICONINFORMATION+$MB_TOPMOST, "Creating new Exclusion", "Please close the application you want to exclude, wait a few seconds, then click OK") = $IDOK Then
+					$aBefore = ProcessList()
+					_ArrayColDelete($aBefore, 1)
+					If MsgBox($MB_OKCANCEL+$MB_ICONINFORMATION+$MB_TOPMOST, "Creating new Exclusion", "Snapshot created. Please launch the application you want to exclude, wait a few seconds, then click OK") = $IDOK Then
+						$aAfter = ProcessList()
+						_ArrayColDelete($aAfter, 1)
+						For $iLoop = 1 To $aBefore[0][0] Step 1
+							_ArrayRemove($aAfter, $aBefore[$iLoop][0])
+							ProgressSet(Round($iLoop/$aBefore[0][0]))
+						Next
+						ProgressOff()
+						_ArrayDisplay($aAfter)
+					EndIf
+				EndIf
+#ce
+
+
+			Case $hRemCustom
+				$hFile = FileOpenDialog("Select Definition File to Unload", @WorkingDir, "Exclusions Definition (*.def)", $FD_FILEMUSTEXIST, "exclusion.def", $hGUI)
+				If @error Then
+					;;;
+				Else
+					_RemoveCustom($hFile, $aProcessExclusions, $aServicesExclusions)
+					_ArrayDisplay($aProcessExclusions)
+					_ArrayDisplay($aServicesExclusions)
+				EndIf
+
+
 			Case $hToggle
 				GUICtrlSetState($hToggle, $GUI_DISABLE)
 				If Not $bSuspended Then
 					GUICtrlSetState($hAggressive, $GUI_DISABLE)
 					$aServicesSnapshot = _ServicesList()
-					_FreezeToStock($aProcessExclusions, $aServicesExclusions, _IsChecked($hAggressive), $hStatus)
+					_FreezeToStock($aProcessExclusions, $aServicesExclusions, Not _IsChecked($hAggressive), $hStatus)
 					$bSuspended = Not $bSuspended
 					GUICtrlSetData($hToggle, " UNFREEZE SYSTEM")
 				Else
-					_ThawFromStock($aProcessExclusions, $aServicesSnapshot, _IsChecked($hAggressive), $hStatus)
+					_ThawFromStock($aProcessExclusions, $aServicesSnapshot, Not _IsChecked($hAggressive), $hStatus)
 					$bSuspended = Not $bSuspended
 					GUICtrlSetState($hAggressive, $GUI_ENABLE)
 					GUICtrlSetData($hToggle, " FREEZE SYSTEM")
 				EndIf
 				GUICtrlSetState($hToggle, $GUI_ENABLE)
+
+			Case $hGithub
+				ShellExecute("https://github.com/rcmaehl/FreezeToStock")
+
+			Case $hDiscord
+				ShellExecute("https://discord.gg/uBnBcBx")
+
+			Case $hDonate
+				ShellExecute("https://www.paypal.me/rhsky")
+
+			Case $hUpdate
+				Switch _GetLatestRelease($sVersion)
+					Case -1
+						MsgBox($MB_OK+$MB_ICONWARNING+$MB_TOPMOST, "Test Build?", "You're running a newer build than publically available!")
+					Case 0
+						Switch @error
+							Case 0
+								MsgBox($MB_OK+$MB_ICONINFORMATION+$MB_TOPMOST, "Up to Date", "You're running the latest build!")
+							Case 1
+								MsgBox($MB_OK+$MB_ICONWARNING+$MB_TOPMOST, "Unable to Check for Updates", "Unable to load release data.")
+							Case 2
+								MsgBox($MB_OK+$MB_ICONWARNING+$MB_TOPMOST, "Unable to Check for Updates", "Invalid Data Received!")
+							Case 3
+								Switch @extended
+									Case 0
+										MsgBox($MB_OK+$MB_ICONWARNING+$MB_TOPMOST, "Unable to Check for Updates", "Invalid Release Tags Received!")
+									Case 1
+										MsgBox($MB_OK+$MB_ICONWARNING+$MB_TOPMOST, "Unable to Check for Updates", "Invalid Release Types Received!")
+								EndSwitch
+						EndSwitch
+					Case 1
+						If MsgBox($MB_YESNO+$MB_ICONINFORMATION+$MB_TOPMOST, "Update Available", "An Update is Availabe, would you like to download it?") = $IDYES Then ShellExecute("https://github.com/rcmaehl/FreezeToStock/releases")
+				EndSwitch
+
 
 			Case Else
 				;;;
@@ -375,6 +471,7 @@ EndFunc
 Func _ArrayRemove(ByRef $aArray, $sRemString)
 	$sTemp = "," & _ArrayToString($aArray, ",") & ","
 	$sTemp = StringReplace($sTemp, "," & $sRemString & ",", ",")
+	$sTemp = StringReplace($sTemp, ",,", ",")
 	If StringLeft($sTemp, 1) = "," Then $sTemp = StringTrimLeft($sTemp, 1)
 	If StringRight($sTemp, 1) = "," Then $sTemp = StringTrimRight($sTemp, 1)
 	If $sTemp = "" Then
@@ -382,7 +479,7 @@ Func _ArrayRemove(ByRef $aArray, $sRemString)
 		_ArrayDelete($aArray, 0)
 	Else
 		$aArray = StringSplit($sTemp, ",", $STR_NOCOUNT)
-	EndIF
+	EndIf
 EndFunc
 
 
@@ -531,6 +628,7 @@ Func _FreezeToStock($aProcessExclusions, $aServicesExclusions, $bAggressive, $hO
 		EndIf
 	Next
 
+	Local $hSCM = _SCMStartup()
 	$aServices = _ServicesList()
 	For $iLoop0 = 0 To 2 Step 1 ; Account for process dependencies
 		For $iLoop1 = 0 to $aServices[0][0] Step 1
@@ -538,27 +636,90 @@ Func _FreezeToStock($aProcessExclusions, $aServicesExclusions, $bAggressive, $hO
 				If _ArraySearch($aServicesExclusions, $aServices[$iLoop1][0]) = -1 Then
 					If $bAggressive Then
 						_GUICtrlStatusBar_SetText($hOutput, $iLoop0 + 1 & "/3 Service: " & $aServices[$iLoop1][0], 1)
-						_ServiceStop($aServices[$iLoop1][0])
+						_ServiceStop($hSCM, $aServices[$iLoop1][0])
 					Else
 						_GUICtrlStatusBar_SetText($hOutput, $iLoop0 + 1 & "/3 Service: " & $aServices[$iLoop1][0], 1)
-						_ServicePause($aServices[$iLoop1][0])
+						_ServicePause($hSCM, $aServices[$iLoop1][0])
 					EndIf
-					Sleep(100)
+					Sleep(10)
 				Else
 					ConsoleWrite("Skipped " & $aServices[$iLoop1][0] & @CRLF)
 				EndIf
 			EndIf
 		Next
 	Next
+	_SCMShutdown($hSCM)
 
 	_GUICtrlStatusBar_SetText($hOutput, "", 0)
 	_GUICtrlStatusBar_SetText($hOutput, "", 1)
 
 EndFunc
 
+Func _GetLatestRelease($sCurrent)
+
+	Local $dAPIBin
+	Local $sAPIJSON
+
+	$dAPIBin = InetRead("https://api.github.com/repos/rcmaehl/FreezeToStock/releases")
+	If @error Then Return SetError(1, 0, 0)
+	$sAPIJSON = BinaryToString($dAPIBin)
+	If @error Then Return SetError(2, 0, 0)
+
+	Local $aReleases = _StringBetween($sAPIJSON, '"tag_name":"', '",')
+	If @error Then Return SetError(3, 0, 0)
+	Local $aRelTypes = _StringBetween($sAPIJSON, '"prerelease":', ',')
+	If @error Then Return SetError(3, 1, 0)
+	Local $aCombined[UBound($aReleases)][2]
+
+	For $iLoop = 0 To UBound($aReleases) - 1 Step 1
+		$aCombined[$iLoop][0] = $aReleases[$iLoop]
+		$aCombined[$iLoop][1] = $aRelTypes[$iLoop]
+	Next
+
+	Return _VersionCompare($aCombined[0][0], $sCurrent)
+
+EndFunc
+
 Func _IsChecked($idControlID)
     Return BitAND(GUICtrlRead($idControlID), $GUI_CHECKED) = $GUI_CHECKED
 EndFunc   ;==>_IsChecked
+
+Func _LoadCustom($sFile, ByRef $aProcessExclusions, ByRef $aServicesExclusions)
+
+	Local $hFile
+	Local $aLine
+
+	If FileExists($sFile) Then
+		$hFile = FileOpen($sFile)
+		If @error Then SetError(2,0,0)
+	Else
+		SetError(2,1,0)
+	EndIf
+
+	Local $iLines = _FileCountLines($sFile)
+
+	For $iLine = 1 to $iLines Step 1
+		$sLine = FileReadLine($hFile, $iLine)
+		If @error = -1 Then ExitLoop
+		$aLine = StringSplit($sLine, ",", $STR_NOCOUNT)
+		If UBound($aLine) <> 2 Then ContinueLoop
+		Switch $aLine[0]
+
+			Case "Process"
+				_ArrayAdd($aProcessExclusions, $aLine[1])
+
+			Case "Service"
+				_ArrayAdd($aServicesExclusions, $aLine[1])
+
+			Case Else
+				ContinueLoop
+
+		EndSwitch
+	Next
+
+	FileClose($hFile)
+
+EndFunc
 
 Func _ProcessSuspend($iPID)
 	$ai_Handle = DllCall("kernel32.dll", 'int', 'OpenProcess', 'int', 0x1f0fff, 'int', False, 'int', $iPID)
@@ -584,6 +745,43 @@ Func _ProcessResume($iPID)
 	EndIf
 EndFunc
 
+Func _RemoveCustom($sFile, ByRef $aProcessExclusions, ByRef $aServicesExclusions)
+
+	Local $hFile
+	Local $aLine
+
+	If FileExists($sFile) Then
+		$hFile = FileOpen($sFile)
+		If @error Then SetError(2,0,0)
+	Else
+		SetError(2,1,0)
+	EndIf
+
+	Local $iLines = _FileCountLines($sFile)
+
+	For $iLine = 1 to $iLines Step 1
+		$sLine = FileReadLine($hFile, $iLine)
+		If @error = -1 Then ExitLoop
+		$aLine = StringSplit($sLine, ",", $STR_NOCOUNT)
+		If UBound($aLine) <> 2 Then ContinueLoop
+		Switch $aLine[0]
+
+			Case "Process"
+				_ArrayRemove($aProcessExclusions, $aLine[1])
+
+			Case "Service"
+				_ArrayRemove($aServicesExclusions, $aLine[1])
+
+			Case Else
+				ContinueLoop
+
+		EndSwitch
+	Next
+
+	FileClose($hFile)
+
+EndFunc
+
 ; #FUNCTION# ====================================================================================================================
 ; Name ..........: _ServicesList
 ; Description ...: Get a list of Services and their current state
@@ -591,7 +789,7 @@ EndFunc
 ; Parameters ....:
 ; Return values .: An Array containing [0][0] Services Count, [x][0] Service name, [x][1] Service State
 ; Author ........: rcmaehl (Robert Maehl) based on work by Kyan
-; Modified ......: 9/5/2020
+; Modified ......: 09/05/2020
 ; Remarks .......:
 ; Related .......:
 ; Link ..........:
@@ -625,7 +823,7 @@ EndFunc
 ;                  $hOutput             - [optional] Handle of the GUI Console. Default is False, for none.
 ; Return values .: 1                    - An error has occured
 ; Author ........: rcmaehl (Robert Maehl)
-; Modified ......: 09/5/2020
+; Modified ......: 09/06/2020
 ; Remarks .......:
 ; Related .......:
 ; Link ..........:
@@ -645,22 +843,24 @@ Func _ThawFromStock($aProcessExclusions, $aServicesSnapshot, $bAggressive = Fals
 		EndIf
 	Next
 
+	Local $hSCM = _SCMStartup()
 	For $iLoop0 = 0 To 2 Step 1 ; Account for process dependencies
 		For $iLoop1 = 0 to $aServicesSnapshot[0][0] Step 1
 			If $aServicesSnapshot[$iLoop1][1] = "RUNNING" Then
 				If $bAggressive Then
 					_GUICtrlStatusBar_SetText($hOutput, $iLoop0 + 1 & "/3 Service: " & $aServicesSnapshot[$iLoop1][0], 1)
-					_ServiceStart($aServicesSnapshot[$iLoop1][0])
+					_ServiceStart($hSCM, $aServicesSnapshot[$iLoop1][0])
 				Else
 					_GUICtrlStatusBar_SetText($hOutput, $iLoop0 + 1 & "/3 Service: " & $aServicesSnapshot[$iLoop1][0], 1)
-					_ServiceContinue($aServicesSnapshot[$iLoop1][0])
+					_ServiceContinue($hSCM, $aServicesSnapshot[$iLoop1][0])
 				EndIf
-				Sleep(100)
+				Sleep(10)
 			Else
 				;;;
 			EndIf
 		Next
 	Next
+	_SCMShutdown($hSCM)
 
 	_GUICtrlStatusBar_SetText($hOutput, "", 0)
 	_GUICtrlStatusBar_SetText($hOutput, "", 1)
