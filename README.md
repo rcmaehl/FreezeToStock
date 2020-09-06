@@ -10,7 +10,7 @@ In simpler terms, you can essentially use the Hibernate power option for a speci
 
 ![](https://i.imgur.com/cw3oN1y.png)
 
-And it's not just limited to Windows 10 apps, but to almost all processes. Microsoft actually has their own tool for this called [PsSuspend](https://docs.microsoft.com/en-us/sysinternals/downloads/pssuspend) but it's not useful if you don't know what programs you do and don't want to suspend. Additionally, the program pauses Services based on the same debloater script. Once again, Microsoft has their own tool for this called [PsService](https://docs.microsoft.com/en-us/sysinternals/downloads/psservice) but once again you need an idea of what services you want to pause.
+And it's not just limited to Windows 10 apps, but to almost all processes. Microsoft actually has their own tool for this called [PsSuspend](https://docs.microsoft.com/en-us/sysinternals/downloads/pssuspend) but it's not useful if you don't know what programs you do and don't want to suspend. Additionally, Freeze to Stock pauses Services based on the same debloater script. Once again, Microsoft has their own tool for this called [PsService](https://docs.microsoft.com/en-us/sysinternals/downloads/psservice) but once again you need an idea of what services you want to pause.
 
 So far results have been promising on my 4 year old Windows 10 install (Yes, that is about 40+ chrome tabs open and suspended):
 
