@@ -58,8 +58,9 @@ Func Main()
 			Local $hMSIE = GUICtrlCreateMenuItem("IE", $hBrowsers)
 		Local $hHardware = GUICtrlCreateMenu("Hardware", $hExclude)
 			Local $hCorsiar = GUICtrlCreateMenuItem("Corsair iCUE", $hHardware)
-			Local $hMSMK = GUICtrlCreateMenuItem("Microsft Mouse & Keyboard", $hHardware)
+			Local $hMSMK = GUICtrlCreateMenuItem("Microsft Mouse && Keyboard", $hHardware)
 		Local $hLaunchers = GUICtrlCreateMenu("Launchers", $hExclude)
+			Local $hEpik = GUICtrlCreateMenuItem("Epic Games", $hLaunchers)
 			Local $hParsec = GUICtrlCreateMenuItem("Parsec", $hLaunchers)
 			Local $hSteam = GUICtrlCreateMenuItem("Steam", $hLaunchers)
 			Local $hHTCVP = GUICtrlCreateMenuItem("VivePort", $hLaunchers)
@@ -103,7 +104,7 @@ Func Main()
 				FileWrite(".\export.csv", "[SERVICES]" & @CRLF)
 				FileWrite(".\export.csv", _ArrayToString(_ServicesList(), ",") & @CRLF)
 
-			Case $hBE, $hEAC, $hAMD To $hXSplit, $hChrome to $hMSIE, $hCorsiar, $hMSMK, $hParsec to $hXbox, $hDiscord, $hOculus To $hWinMR
+			Case $hBE, $hEAC, $hAMD To $hXSplit, $hChrome to $hMSIE, $hCorsiar, $hMSMK, $hEpik to $hXbox, $hDiscord, $hOculus To $hWinMR
 				If _IsChecked($hMsg) Then
 					GUICtrlSetState($hMsg, $GUI_UNCHECKED)
 					Switch $hMsg
@@ -180,6 +181,8 @@ Func Main()
 							_ArrayRemove($aProcessExclusions, "MKCHelper.exe")
 							_ArrayRemove($aProcessExclusions, "ipoint.exe")
 							_ArrayRemove($aProcessExclusions, "itype.exe")
+						Case $hEpik
+							_ArrayRemove($aProcessExclusions, "EpicGamesLauncher.exe")
 						Case $hParsec
 							_ArrayRemove($aProcessExclusions, "pservice.exe")
 							_ArrayRemove($aProcessExclusions, "parsecd.exe")
@@ -296,6 +299,8 @@ Func Main()
 							_ArrayAdd($aProcessExclusions, "MKCHelper.exe")
 							_ArrayAdd($aProcessExclusions, "ipoint.exe")
 							_ArrayAdd($aProcessExclusions, "itype.exe")
+						Case $hEpik
+							_ArrayAdd($aProcessExclusions, "EpicGamesLauncher.exe")
 						Case $hParsec
 							_ArrayAdd($aProcessExclusions, "pservice.exe")
 							_ArrayAdd($aProcessExclusions, "parsecd.exe")
