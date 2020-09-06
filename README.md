@@ -2,11 +2,11 @@
 Temporarily Pause Non-Required System Processes and Services  | [Download Under Releases](https://github.com/rcmaehl/FreezeToStock/releases)
 
 ### What is it?
-This project, Freeze to Stock, takes [Sycnex's Windows 10 Debloater script](https://github.com/Sycnex/Windows10Debloater), including others soon, and uses it as baseline for what a debloated system SHOULD look like. You can see it in action here from JayzTwoCents. Freeze to Stock then turns your PC into this debloated example using a feature added since Windows Vista called process suspension. Microsoft defines this as
+This project, Freeze to Stock, takes [Sycnex's Windows 10 Debloater script](https://github.com/Sycnex/Windows10Debloater), including others soon, and uses it as baseline for what a debloated system SHOULD look like. You can see it in action [here from JayzTwoCents](https://youtu.be/DcDgV-1zDKs?t=859). Freeze to Stock then turns your PC into this debloated example using a feature added since Windows Vista called process suspension. Microsoft defines this as
 
-*Suspend processes on the local or a remote system, which is desirable in cases where a process is consuming a resource (e.g. network, CPU or disk) that you want to allow different processes to use. Rather than kill the process that's consuming the resource, suspending permits you to let it continue operation at some later point in time.*
+*Suspend [a] processes on the local or a remote system, which is desirable in cases where a process is consuming a resource (e.g. network, CPU or disk) that you want to allow different processes to use. Rather than kill the process that's consuming the resource, suspending permits you to let it continue operation at some later point in time.*
 
-In simpler terms, you can essentially use the Hibernate power option for a specific program instead of the entire PC. This will not decrease RAM usage but will entirely cease CPU usage for the program. If you've ever seen the below leaf icon in Task Manager it's from a Windows 10 App using it:
+In simpler terms, you can essentially use the Hibernate power option for a specific program instead of the entire PC. This will not decrease RAM usage but will **entirely cease CPU usage** for the suspended program. If you've ever seen the below leaf icon in Task Manager it's from a Windows 10 App using it:
 
 ![](https://i.imgur.com/cw3oN1y.png)
 
