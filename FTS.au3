@@ -4,8 +4,8 @@
 #AutoIt3Wrapper_Icon=.\icon.ico
 #AutoIt3Wrapper_UseX64=y
 #AutoIt3Wrapper_Res_Description=Freeze To Stock
-#AutoIt3Wrapper_Res_Fileversion=1.0
-#AutoIt3Wrapper_Res_ProductVersion=1.0
+#AutoIt3Wrapper_Res_Fileversion=1.1
+#AutoIt3Wrapper_Res_ProductVersion=1.1
 #AutoIt3Wrapper_Res_LegalCopyright=Robert Maehl, using LGPL 3 License
 #AutoIt3Wrapper_Res_Language=1033
 #AutoIt3Wrapper_Res_requestedExecutionLevel=highestAvailable
@@ -33,11 +33,12 @@ Main()
 
 Func Main()
 
-	Local $sVersion = "1.0"
+	Local $sVersion = "1.1"
 
 	Local $aStatusSize[2] = [75, -1]
 
 	Local $bSuspended = False
+	Local $hActive, $hLastActive
 
 	Local $aAfter, $aBefore, $aFinal[0]
 
@@ -92,7 +93,7 @@ Func Main()
 
 	Local $hHelp = GUICtrlCreateMenu("Help")
 	Local $hGithub = GUICtrlCreateMenuItem("Github", $hHelp)
-	Local $hDiscord = GUICtrlCreateMenuItem("Discord", $hHelp)
+	Local $hDisWeb = GUICtrlCreateMenuItem("Discord", $hHelp)
 		GUICtrlSetState(-1, $GUI_DISABLE)
 	GUICtrlCreateMenuItem("", $hHelp)
 	Local $hDonate = GUICtrlCreateMenuItem("Donate", $hHelp)
@@ -104,7 +105,12 @@ Func Main()
 			GUICtrlSetFont(-1, 20)
 			GUICtrlSetImage(-1, ".\Includes\freeze_small.ico", -1, 0)
 
-		Local $hAggressive = GUICtrlCreateCheckbox("Pause Services instead of Stopping", 12, 85, 300, 20)
+		Local $hThawTop = GUICtrlCreateCheckbox("Thaw Active Window", 12, 85, 296, 20)
+			GUICtrlSetState(-1, $GUI_DISABLE)
+			Local $hReFreeze = GUICtrlCreateCheckbox("Refreeze inactive thawed Windows", 12, 105, 296, 20)
+				GUICtrlSetState(-1, $GUI_DISABLE)
+
+		Local $hAggressive = GUICtrlCreateCheckbox("Pause Services instead of Stopping", 12, 125, 296, 20)
 			GUICtrlSetTip(-1, "Very few Services allow Pausing, but still gives some results")
 
 	$hStatus = _GUICtrlStatusBar_Create($hGUI, $aStatusSize)
@@ -113,6 +119,14 @@ Func Main()
 	While 1
 
 		$hMsg = GUIGetMsg()
+
+		If $bSuspended And _IsChecked($hThawTop) Then
+			$hActive = WinActive
+			If Not $hActive = $hLastActive Then
+				_ProcessResume(WinGetProcess($hActive))
+				$hLastActive = $hActive
+			EndIf
+		EndIf
 
 		Switch $hMsg
 
@@ -373,8 +387,6 @@ Func Main()
 					;;;
 				Else
 					_LoadCustom($hFile, $aProcessExclusions, $aServicesExclusions)
-					_ArrayDisplay($aProcessExclusions)
-					_ArrayDisplay($aServicesExclusions)
 				EndIf
 
 #cs
@@ -404,8 +416,6 @@ Func Main()
 					;;;
 				Else
 					_RemoveCustom($hFile, $aProcessExclusions, $aServicesExclusions)
-					_ArrayDisplay($aProcessExclusions)
-					_ArrayDisplay($aServicesExclusions)
 				EndIf
 
 
@@ -428,7 +438,7 @@ Func Main()
 			Case $hGithub
 				ShellExecute("https://github.com/rcmaehl/FreezeToStock")
 
-			Case $hDiscord
+			Case $hDisWeb
 				ShellExecute("https://discord.gg/uBnBcBx")
 
 			Case $hDonate
@@ -508,9 +518,18 @@ Func _FreezeToStock($aProcessExclusions, $aServicesExclusions, $bAggressive, $hO
 	Else
 		Local $aSelf[3] = ["AutoIt3.exe", "AutoIt3_x64.exe", "SciTE.exe"]
 	EndIf
-	Local $aSystemProcesses[32] = ["ApplicationFrameHost.exe", _
+
+	Local $aCantBeSuspended[6] = ["Memory Compression", _
+									"Registry", _
+									"Secure System", _
+									"System", _
+									"System Idle Process", _
+									"System Interrupts"]
+
+	Local $aSystemProcesses[33] = ["ApplicationFrameHost.exe", _
 									"backgroundTaskHost.exe", _
 									"csrss.exe", _ ; Runtime System Service
+									"ctfmon.exe", _ ; Alternative Input
 									"dllhost.exe", _ ; COM Host
 									"dwm.exe", _ ; Desktop Window Manager / Compositer
 									"explorer.exe", _ ; Windows Explorer
@@ -614,6 +633,7 @@ Func _FreezeToStock($aProcessExclusions, $aServicesExclusions, $bAggressive, $hO
 									"wscsvc"] ; Security Center
 
 	_ArrayConcatenate($aProcessExclusions, $aSelf)
+	_ArrayConcatenate($aProcessExclusions, $aCantBeSuspended)
 	_ArrayConcatenate($aProcessExclusions, $aSystemProcesses)
 
 	_ArrayConcatenate($aServicesExclusions, $aSystemServices)
