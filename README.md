@@ -1,7 +1,7 @@
 # FreezeToStock
 Temporarily Pause Non-Required System Processes and Services for Gaming | [Download Under Releases](https://github.com/rcmaehl/FreezeToStock/releases)
 
-![](https://i.imgur.com/vmWz3d5.png)
+![](https://i.imgur.com/9vd5xNP.png)
 
 ### What is it?
 This project, Freeze to Stock, takes [Sycnex's Windows 10 Debloater script](https://github.com/Sycnex/Windows10Debloater), including others soon, and uses it as baseline for what a debloated system SHOULD look like. You can see it in action [here from JayzTwoCents](https://youtu.be/DcDgV-1zDKs?t=859). Freeze to Stock then turns your PC into this debloated example for significantly decreased background CPU usage while gaming.
