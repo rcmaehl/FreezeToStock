@@ -23,11 +23,14 @@
 #include <GUIConstantsEx.au3>
 #include <ButtonConstants.au3>
 #include <MsgBoxConstants.au3>
+#include <StaticConstants.au3>
 #include <StringConstants.au3>
 #include <WindowsConstants.au3>
 
 ; Manual Includes
 #include ".\Includes\Services.au3"
+
+Opt("WinTitleMatchMode", 4)
 
 Main()
 
@@ -105,13 +108,19 @@ Func Main()
 			GUICtrlSetFont(-1, 20)
 			GUICtrlSetImage(-1, ".\Includes\freeze_small.ico", -1, 0)
 
-		Local $hThawTop = GUICtrlCreateCheckbox("Thaw Active Window", 12, 85, 296, 20)
+		Local $hServices = GUICtrlCreateCheckbox("Freeze Services as well as Processes", 12, 85, 296, 15)
+			GUICtrlCreateLabel(Chrw(9625), 12, 100, 15, 15, $SS_CENTER)
+			Local $hAggressive = GUICtrlCreateCheckbox("Stop Services instead of just Pausing", 27, 100, 286, 15)
+				GUICtrlSetTip(-1, "This will give stronger results for lower powered devices")
+
+		Local $hThawTop = GUICtrlCreateCheckbox("Thaw Active Window (Coming Soon)", 12, 115, 296, 15)
 			GUICtrlSetState(-1, $GUI_DISABLE)
-			Local $hReFreeze = GUICtrlCreateCheckbox("Refreeze inactive thawed Windows", 12, 105, 296, 20)
+			GUICtrlCreateLabel(Chrw(9625), 12, 130, 15, 15, $SS_CENTER)
+			GUICtrlSetState(-1, $GUI_DISABLE)
+			Local $hReFreeze = GUICtrlCreateCheckbox("Refreeze Inactive Thawed Windows", 27, 130, 286, 20)
 				GUICtrlSetState(-1, $GUI_DISABLE)
 
-		Local $hAggressive = GUICtrlCreateCheckbox("Pause Services instead of Stopping", 12, 125, 296, 20)
-			GUICtrlSetTip(-1, "Very few Services allow Pausing, but still gives some results")
+	;	Local $hThawCycle = GUICtrlCreateCheckbox("Unthaw/Rethaw Processes Occasionally", 12, 145,
 
 	$hStatus = _GUICtrlStatusBar_Create($hGUI, $aStatusSize)
 	GUISetState(@SW_SHOW, $hGUI)
@@ -121,7 +130,7 @@ Func Main()
 		$hMsg = GUIGetMsg()
 
 		If $bSuspended And _IsChecked($hThawTop) Then
-			$hActive = WinActive
+			$hActive = WinActive("[ACTIVE]")
 			If Not $hActive = $hLastActive Then
 				_ProcessResume(WinGetProcess($hActive))
 				$hLastActive = $hActive
@@ -424,11 +433,11 @@ Func Main()
 				If Not $bSuspended Then
 					GUICtrlSetState($hAggressive, $GUI_DISABLE)
 					$aServicesSnapshot = _ServicesList()
-					_FreezeToStock($aProcessExclusions, $aServicesExclusions, Not _IsChecked($hAggressive), $hStatus)
+					_FreezeToStock($aProcessExclusions, _IsChecked($hServices), $aServicesExclusions, _IsChecked($hAggressive), $hStatus)
 					$bSuspended = Not $bSuspended
 					GUICtrlSetData($hToggle, " UNFREEZE SYSTEM")
 				Else
-					_ThawFromStock($aProcessExclusions, $aServicesSnapshot, Not _IsChecked($hAggressive), $hStatus)
+					_ThawFromStock($aProcessExclusions, _IsChecked($hServices), $aServicesSnapshot, _IsChecked($hAggressive), $hStatus)
 					$bSuspended = Not $bSuspended
 					GUICtrlSetState($hAggressive, $GUI_ENABLE)
 					GUICtrlSetData($hToggle, " FREEZE SYSTEM")
@@ -498,18 +507,19 @@ EndFunc
 ; Description ...: Suspend unneeded processes, excluding minialistic required system processes
 ; Syntax ........: _FreezeToStock($aExclusions, $hOutput = False]])
 ; Parameters ....: $aProcessExclusions  - Array of Processes to Exclude
+;                  $bIncludeServices    - Boolean for whether or not services should be included
 ;                  $aServicesExclusions - Array of Services to Exclude
-;                  $bAggressive         - Boolean for Whether or not sc stop should be used
+;                  $bAggressive         - Boolean for whether or not sc stop should be used
 ;                  $hOutput             - Handle of the GUI Console
 ; Return values .: 1                    - An error has occured
 ; Author ........: rcmaehl (Robert Maehl)
-; Modified ......: 09/05/2020
+; Modified ......: 09/07/2020
 ; Remarks .......:
 ; Related .......:
 ; Link ..........:
 ; Example .......: No
 ; ===============================================================================================================================
-Func _FreezeToStock($aProcessExclusions, $aServicesExclusions, $bAggressive, $hOutput)
+Func _FreezeToStock($aProcessExclusions, $bIncludeServices, $aServicesExclusions, $bAggressive, $hOutput)
 
 	_GUICtrlStatusBar_SetText($hOutput, "Freezing...", 0)
 
@@ -648,27 +658,29 @@ Func _FreezeToStock($aProcessExclusions, $aServicesExclusions, $bAggressive, $hO
 		EndIf
 	Next
 
-	Local $hSCM = _SCMStartup()
-	$aServices = _ServicesList()
-	For $iLoop0 = 0 To 2 Step 1 ; Account for process dependencies
-		For $iLoop1 = 0 to $aServices[0][0] Step 1
-			If $aServices[$iLoop1][1] = "RUNNING" Then
-				If _ArraySearch($aServicesExclusions, $aServices[$iLoop1][0]) = -1 Then
-					If $bAggressive Then
-						_GUICtrlStatusBar_SetText($hOutput, $iLoop0 + 1 & "/3 Service: " & $aServices[$iLoop1][0], 1)
-						_ServiceStop($hSCM, $aServices[$iLoop1][0])
+	If $bIncludeServices Then
+		Local $hSCM = _SCMStartup()
+		$aServices = _ServicesList()
+		For $iLoop0 = 0 To 2 Step 1 ; Account for process dependencies
+			For $iLoop1 = 0 to $aServices[0][0] Step 1
+				If $aServices[$iLoop1][1] = "RUNNING" Then
+					If _ArraySearch($aServicesExclusions, $aServices[$iLoop1][0]) = -1 Then
+						If $bAggressive Then
+							_GUICtrlStatusBar_SetText($hOutput, $iLoop0 + 1 & "/3 Service: " & $aServices[$iLoop1][0], 1)
+							_ServiceStop($hSCM, $aServices[$iLoop1][0])
+						Else
+							_GUICtrlStatusBar_SetText($hOutput, $iLoop0 + 1 & "/3 Service: " & $aServices[$iLoop1][0], 1)
+							_ServicePause($hSCM, $aServices[$iLoop1][0])
+						EndIf
+						Sleep(10)
 					Else
-						_GUICtrlStatusBar_SetText($hOutput, $iLoop0 + 1 & "/3 Service: " & $aServices[$iLoop1][0], 1)
-						_ServicePause($hSCM, $aServices[$iLoop1][0])
+						ConsoleWrite("Skipped " & $aServices[$iLoop1][0] & @CRLF)
 					EndIf
-					Sleep(10)
-				Else
-					ConsoleWrite("Skipped " & $aServices[$iLoop1][0] & @CRLF)
 				EndIf
-			EndIf
+			Next
 		Next
-	Next
-	_SCMShutdown($hSCM)
+		_SCMShutdown($hSCM)
+	EndIf
 
 	_GUICtrlStatusBar_SetText($hOutput, "", 0)
 	_GUICtrlStatusBar_SetText($hOutput, "", 1)
@@ -838,18 +850,19 @@ EndFunc
 ; Description ...: Unsuspend all processes
 ; Syntax ........: _FreezeToStock(Byref $aExclusions, $hOutput = False]])
 ; Parameters ....: $aProcessExclusions  - Array of Processes to Exclude
+;                  $bIncludeServices    - Boolean for whether or not services should be included
 ;                  $aServicesSnapshot   - Array of Previously Running Services
 ;                  $bAggressive         - Boolean for Whether or not sc stop was used
 ;                  $hOutput             - [optional] Handle of the GUI Console. Default is False, for none.
 ; Return values .: 1                    - An error has occured
 ; Author ........: rcmaehl (Robert Maehl)
-; Modified ......: 09/06/2020
+; Modified ......: 09/07/2020
 ; Remarks .......:
 ; Related .......:
 ; Link ..........:
 ; Example .......: No
 ; ===============================================================================================================================
-Func _ThawFromStock($aProcessExclusions, $aServicesSnapshot, $bAggressive = False, $hOutput = False)
+Func _ThawFromStock($aProcessExclusions, $bIncludeServices, $aServicesSnapshot, $bAggressive, $hOutput)
 
 	_GUICtrlStatusBar_SetText($hOutput, "Thawing...", 0)
 
@@ -863,24 +876,26 @@ Func _ThawFromStock($aProcessExclusions, $aServicesSnapshot, $bAggressive = Fals
 		EndIf
 	Next
 
-	Local $hSCM = _SCMStartup()
-	For $iLoop0 = 0 To 2 Step 1 ; Account for process dependencies
-		For $iLoop1 = 0 to $aServicesSnapshot[0][0] Step 1
-			If $aServicesSnapshot[$iLoop1][1] = "RUNNING" Then
-				If $bAggressive Then
-					_GUICtrlStatusBar_SetText($hOutput, $iLoop0 + 1 & "/3 Service: " & $aServicesSnapshot[$iLoop1][0], 1)
-					_ServiceStart($hSCM, $aServicesSnapshot[$iLoop1][0])
+	If $bIncludeServices Then
+		Local $hSCM = _SCMStartup()
+		For $iLoop0 = 0 To 2 Step 1 ; Account for process dependencies
+			For $iLoop1 = 0 to $aServicesSnapshot[0][0] Step 1
+				If $aServicesSnapshot[$iLoop1][1] = "RUNNING" Then
+					If $bAggressive Then
+						_GUICtrlStatusBar_SetText($hOutput, $iLoop0 + 1 & "/3 Service: " & $aServicesSnapshot[$iLoop1][0], 1)
+						_ServiceStart($hSCM, $aServicesSnapshot[$iLoop1][0])
+					Else
+						_GUICtrlStatusBar_SetText($hOutput, $iLoop0 + 1 & "/3 Service: " & $aServicesSnapshot[$iLoop1][0], 1)
+						_ServiceContinue($hSCM, $aServicesSnapshot[$iLoop1][0])
+					EndIf
+					Sleep(10)
 				Else
-					_GUICtrlStatusBar_SetText($hOutput, $iLoop0 + 1 & "/3 Service: " & $aServicesSnapshot[$iLoop1][0], 1)
-					_ServiceContinue($hSCM, $aServicesSnapshot[$iLoop1][0])
+					;;;
 				EndIf
-				Sleep(10)
-			Else
-				;;;
-			EndIf
+			Next
 		Next
-	Next
-	_SCMShutdown($hSCM)
+		_SCMShutdown($hSCM)
+	EndIf
 
 	_GUICtrlStatusBar_SetText($hOutput, "", 0)
 	_GUICtrlStatusBar_SetText($hOutput, "", 1)
