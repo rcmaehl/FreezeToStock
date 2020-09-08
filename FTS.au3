@@ -25,6 +25,7 @@
 #include <MsgBoxConstants.au3>
 #include <StaticConstants.au3>
 #include <StringConstants.au3>
+#include <UpDownConstants.au3>
 #include <WindowsConstants.au3>
 
 ; Manual Includes
@@ -45,10 +46,10 @@ Func Main()
 
 	Local $aAfter, $aBefore, $aFinal[0]
 
-	Local $aProcessExclusions[0] = []
+	Local $aProcessExclusions[0]
 	Local $aServicesExclusions[0]
 
-	Local $hGUI = GUICreate("Freeze To Stock", 320, 240, -1, -1, BitOr($WS_MINIMIZEBOX, $WS_CAPTION, $WS_SYSMENU))
+	Local $hGUI = GUICreate("FreezeToStock", 320, 240, -1, -1, BitOr($WS_MINIMIZEBOX, $WS_CAPTION, $WS_SYSMENU))
 
 	Local $hFile = GUICtrlCreateMenu("File")
 		Local $hExport = GUICtrlCreateMenuItem("Export", $hFile)
@@ -109,18 +110,32 @@ Func Main()
 			GUICtrlSetImage(-1, ".\Includes\freeze_small.ico", -1, 0)
 
 		Local $hServices = GUICtrlCreateCheckbox("Freeze Services as well as Processes", 12, 85, 296, 15)
+			GUICtrlSetTip(-1, "Include Services for stronger results")
 			GUICtrlCreateLabel(Chrw(9625), 12, 100, 15, 15, $SS_CENTER)
 			Local $hAggressive = GUICtrlCreateCheckbox("Stop Services instead of just Pausing", 27, 100, 286, 15)
+				GUICtrlSetState(-1, $GUI_DISABLE)
 				GUICtrlSetTip(-1, "This will give stronger results for lower powered devices")
 
 		Local $hThawTop = GUICtrlCreateCheckbox("Thaw Active Window (Coming Soon)", 12, 115, 296, 15)
 			GUICtrlSetState(-1, $GUI_DISABLE)
 			GUICtrlCreateLabel(Chrw(9625), 12, 130, 15, 15, $SS_CENTER)
 			GUICtrlSetState(-1, $GUI_DISABLE)
-			Local $hReFreeze = GUICtrlCreateCheckbox("Refreeze Inactive Thawed Windows", 27, 130, 286, 20)
+			Local $hReFreeze = GUICtrlCreateCheckbox("Refreeze Inactive Thawed Windows", 27, 130, 286, 15)
 				GUICtrlSetState(-1, $GUI_DISABLE)
 
-	;	Local $hThawCycle = GUICtrlCreateCheckbox("Unthaw/Rethaw Processes Occasionally", 12, 145,
+		Local $hThawCycle = GUICtrlCreateCheckbox("Unthaw/Rethaw Processes (Coming Soon)", 12, 145, 296, 15)
+			GUICtrlSetState(-1, $GUI_DISABLE)
+			GUICtrlCreateLabel(Chrw(9625), 12, 160, 15, 15, $SS_CENTER)
+			GUICtrlSetState(-1, $GUI_DISABLE)
+			GUICtrlCreateLabel("Every", 27, 161, 30, 15)
+			Local $hCycle = GUICtrlCreateInput("60", 57, 160, 40, 15, $ES_READONLY)
+				GUICtrlCreateUpdown(-1,$UDS_ARROWKEYS+$UDS_SETBUDDYINT)
+				GUICtrlSetLimit(-1, 360, 1)
+			GUICtrlCreateLabel("Minute(s) for", 101, 161, 60, 15)
+			Local $hPeriod = GUICtrlCreateInput("5", 165, 160, 40, 15, $ES_READONLY)
+				GUICtrlCreateUpdown(-1,$UDS_ARROWKEYS+$UDS_SETBUDDYINT)
+				GUICtrlSetLimit(-1, 60, 5)
+			GUICtrlCreateLabel("Seconds", 206, 161, 45, 15)
 
 	$hStatus = _GUICtrlStatusBar_Create($hGUI, $aStatusSize)
 	GUISetState(@SW_SHOW, $hGUI)
@@ -431,6 +446,7 @@ Func Main()
 			Case $hToggle
 				GUICtrlSetState($hToggle, $GUI_DISABLE)
 				If Not $bSuspended Then
+					GUICtrlSetState($hServices, $GUI_DISABLE)
 					GUICtrlSetState($hAggressive, $GUI_DISABLE)
 					$aServicesSnapshot = _ServicesList()
 					_FreezeToStock($aProcessExclusions, _IsChecked($hServices), $aServicesExclusions, _IsChecked($hAggressive), $hStatus)
@@ -439,10 +455,29 @@ Func Main()
 				Else
 					_ThawFromStock($aProcessExclusions, _IsChecked($hServices), $aServicesSnapshot, _IsChecked($hAggressive), $hStatus)
 					$bSuspended = Not $bSuspended
+					GUICtrlSetState($hServices, $GUI_ENABLE)
 					GUICtrlSetState($hAggressive, $GUI_ENABLE)
 					GUICtrlSetData($hToggle, " FREEZE SYSTEM")
 				EndIf
 				GUICtrlSetState($hToggle, $GUI_ENABLE)
+
+			Case $hServices
+				If _IsChecked($hServices) Then
+					GUICtrlSetState($hAggressive - 1, $GUI_ENABLE)
+					GUICtrlSetState($hAggressive, $GUI_ENABLE)
+				Else
+					GUICtrlSetState($hAggressive - 1, $GUI_DISABLE)
+					GUICtrlSetState($hAggressive, $GUI_DISABLE)
+				EndIf
+
+			Case $hThawTop
+				If _IsChecked($hThawTop) Then
+					GUICtrlSetState($hReFreeze - 1, $GUI_ENABLE)
+					GUICtrlSetState($hReFreeze, $GUI_ENABLE)
+				Else
+					GUICtrlSetState($hReFreeze - 1, $GUI_DISABLE)
+					GUICtrlSetState($hReFreeze, $GUI_DISABLE)
+				EndIf
 
 			Case $hGithub
 				ShellExecute("https://github.com/rcmaehl/FreezeToStock")
