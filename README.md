@@ -1,5 +1,5 @@
 # FreezeToStock
-Temporarily Pause Non-Required System Processes and Services before Gaming | [Download Under Releases](https://github.com/rcmaehl/FreezeToStock/releases)
+Temporarily Pause Non-Required Processes and Services before Gaming | [Download Under Releases](https://github.com/rcmaehl/FreezeToStock/releases)
 
 ![](https://i.imgur.com/1hMLT9W.png)
 
