@@ -3,7 +3,7 @@
 #AutoIt3Wrapper_Version=Beta
 #AutoIt3Wrapper_Icon=.\icon.ico
 #AutoIt3Wrapper_UseX64=y
-#AutoIt3Wrapper_Res_Comment=Compiled 09/08/2020 @ ~13:30 EST
+#AutoIt3Wrapper_Res_Comment=Compiled 09/08/2020 @ ~13:35 EST
 #AutoIt3Wrapper_Res_Description=Freeze To Stock
 #AutoIt3Wrapper_Res_Fileversion=1.1
 #AutoIt3Wrapper_Res_ProductVersion=1.1
@@ -170,7 +170,7 @@ Func Main()
 				FileWrite(".\export.csv", "[SERVICES]" & @CRLF)
 				FileWrite(".\export.csv", _ArrayToString(_ServicesList(), ",") & @CRLF)
 
-			Case $hBE, $hEAC, $hAMD To $hXSplit, $hChrome to $hMSIE, $hCorsiar, $hMSMK, $hEpik to $hXbox, $hDiscord, $hOculus To $hWinMR
+			Case $hBE, $hEAC, $hAMD To $hXSplit, $hChrome to $hMSIE, $hCorsiar, $hMSMK, $hEpik to $hXbox, $hDiscord, $hMSPT, $hOculus To $hWinMR
 				If _IsChecked($hMsg) Then
 					GUICtrlSetState($hMsg, $GUI_UNCHECKED)
 					Switch $hMsg
