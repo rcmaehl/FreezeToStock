@@ -38,17 +38,17 @@ Main()
 
 Func Main()
 
-	Local $sVersion = "1.1"
+	Local $sVersion = "1.2"
 
 	Local $aStatusSize[2] = [75, -1]
 
 	Local $bSuspended = False
 	Local $hActive, $hLastActive
+	Local $hFreezeTimer, $bThawing = False, $hThawTimer
 
 	Local $aAfter, $aBefore, $aFinal[0]
 
-	Local $aProcessExclusions[0]
-	Local $aServicesExclusions[0]
+	Local $aProcessExclusions[0], $aServicesExclusions[0]
 
 	Local $hGUI = GUICreate("FreezeToStock", 320, 240, -1, -1, BitOr($WS_MINIMIZEBOX, $WS_CAPTION, $WS_SYSMENU))
 
@@ -127,8 +127,7 @@ Func Main()
 			Local $hReFreeze = GUICtrlCreateCheckbox("Refreeze Inactive Thawed Windows", 27, 135, 286, 15)
 				GUICtrlSetState(-1, $GUI_DISABLE)
 
-		Local $hThawCycle = GUICtrlCreateCheckbox("Unthaw/Rethaw Processes (Coming Soon)", 12, 155, 296, 15)
-			GUICtrlSetState(-1, $GUI_DISABLE)
+		Local $hThawCycle = GUICtrlCreateCheckbox("Thaw/Refreeze Processes (BETA)", 12, 155, 296, 15)
 			GUICtrlCreateLabel(Chrw(9625), 12, 170, 15, 15, $SS_CENTER)
 			GUICtrlSetState(-1, $GUI_DISABLE)
 			GUICtrlCreateLabel("Every", 27, 171, 30, 15)
@@ -153,6 +152,22 @@ Func Main()
 			If Not $hActive = $hLastActive Then
 				_ProcessResume(WinGetProcess($hActive))
 				$hLastActive = $hActive
+			EndIf
+		EndIf
+
+		If $bSuspended And _IsChecked($hThawCycle) Then
+			If $bThawing Then
+				If TimerDiff($hThawTimer) >= GUICtrlRead($hPeriod) * 1000 Then
+					ConsoleWrite("Freezing" & @CRLF)
+					_FreezeToStock($aProcessExclusions, _IsChecked($hServices), $aServicesExclusions, _IsChecked($hAggressive), $hStatus)
+					$bThawing = False
+					$hFreezeTimer = TimerInit()
+				EndIf
+			ElseIf TimerDiff($hFreezeTimer) >= GUICtrlRead($hCycle) * 60000 Then
+				ConsoleWrite("Thawing" & @CRLF)
+				_ThawFromStock($aProcessExclusions, _IsChecked($hServices), $aServicesSnapshot, _IsChecked($hAggressive), $hStatus)
+				$bThawing = True
+				$hThawTimer = TimerInit()
 			EndIf
 		EndIf
 
@@ -470,6 +485,7 @@ Func Main()
 					_FreezeToStock($aProcessExclusions, _IsChecked($hServices), $aServicesExclusions, _IsChecked($hAggressive), $hStatus)
 					$bSuspended = Not $bSuspended
 					GUICtrlSetData($hToggle, " UNFREEZE SYSTEM")
+					$hFreezeTimer = TimerInit()
 				Else
 					_ThawFromStock($aProcessExclusions, _IsChecked($hServices), $aServicesSnapshot, _IsChecked($hAggressive), $hStatus)
 					$bSuspended = Not $bSuspended
