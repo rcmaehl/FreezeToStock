@@ -158,13 +158,11 @@ Func Main()
 		If $bSuspended And _IsChecked($hThawCycle) Then
 			If $bThawing Then
 				If TimerDiff($hThawTimer) >= GUICtrlRead($hPeriod) * 1000 Then
-					ConsoleWrite("Freezing" & @CRLF)
 					_FreezeToStock($aProcessExclusions, _IsChecked($hServices), $aServicesExclusions, _IsChecked($hAggressive), $hStatus)
 					$bThawing = False
 					$hFreezeTimer = TimerInit()
 				EndIf
 			ElseIf TimerDiff($hFreezeTimer) >= GUICtrlRead($hCycle) * 60000 Then
-				ConsoleWrite("Thawing" & @CRLF)
 				_ThawFromStock($aProcessExclusions, _IsChecked($hServices), $aServicesSnapshot, _IsChecked($hAggressive), $hStatus)
 				$bThawing = True
 				$hThawTimer = TimerInit()
@@ -481,6 +479,7 @@ Func Main()
 				If Not $bSuspended Then
 					GUICtrlSetState($hServices, $GUI_DISABLE)
 					GUICtrlSetState($hAggressive, $GUI_DISABLE)
+					GUICtrlSetState($hThawCycle, $GUI_DISABLE)
 					$aServicesSnapshot = _ServicesList()
 					_FreezeToStock($aProcessExclusions, _IsChecked($hServices), $aServicesExclusions, _IsChecked($hAggressive), $hStatus)
 					$bSuspended = Not $bSuspended
@@ -490,7 +489,8 @@ Func Main()
 					_ThawFromStock($aProcessExclusions, _IsChecked($hServices), $aServicesSnapshot, _IsChecked($hAggressive), $hStatus)
 					$bSuspended = Not $bSuspended
 					GUICtrlSetState($hServices, $GUI_ENABLE)
-					GUICtrlSetState($hAggressive, $GUI_ENABLE)
+					If _IsChecked($hServices) Then GUICtrlSetState($hAggressive, $GUI_ENABLE)
+					GUICtrlSetState($hThawCycle, $GUI_ENABLE)
 					GUICtrlSetData($hToggle, " FREEZE SYSTEM")
 				EndIf
 				GUICtrlSetState($hToggle, $GUI_ENABLE)
@@ -562,7 +562,7 @@ Func _ArrayRemove(ByRef $aArray, $sRemString)
 	$sTemp = StringReplace($sTemp, ",,", ",")
 	If StringLeft($sTemp, 1) = "," Then $sTemp = StringTrimLeft($sTemp, 1)
 	If StringRight($sTemp, 1) = "," Then $sTemp = StringTrimRight($sTemp, 1)
-	If $sTemp = "" Then
+	If $sTemp = "" Or $sTemp = "," Then
 		$aArray = StringSplit($sTemp, ",", $STR_NOCOUNT)
 		_ArrayDelete($aArray, 0)
 	Else
