@@ -48,6 +48,7 @@ Func Main()
 
 	Local $aAfter, $aBefore, $aFinal[0]
 
+	Local $aServicesSnapshot
 	Local $aProcessExclusions[0], $aServicesExclusions[0]
 
 	Local $hGUI = GUICreate("FreezeToStock", 320, 240, -1, -1, BitOr($WS_MINIMIZEBOX, $WS_CAPTION, $WS_SYSMENU))
@@ -118,7 +119,9 @@ Func Main()
 			GUICtrlCreateLabel(Chrw(9625), 12, 100, 15, 15, $SS_CENTER)
 			Local $hAggressive = GUICtrlCreateCheckbox("Stop Services instead of just Pausing", 27, 100, 286, 15)
 				GUICtrlSetState(-1, $GUI_DISABLE)
-				GUICtrlSetTip(-1, "This will give stronger results for lower powered devices")
+				GUICtrlSetTip(-1, _
+					"This will give stronger results for lower powered devices," & _
+					@CRLF & "Services will automatically be restarted for you.")
 
 		Local $hThawTop = GUICtrlCreateCheckbox("Thaw Active Window (Coming Soon)", 12, 120, 296, 15)
 			GUICtrlSetState(-1, $GUI_DISABLE)
