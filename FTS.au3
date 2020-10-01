@@ -78,6 +78,7 @@ Func Main()
 			Local $hMSIE = GUICtrlCreateMenuItem("IE", $hBrowsers)
 		Local $hHardware = GUICtrlCreateMenu("Hardware", $hExclude)
 			Local $hCorsiar = GUICtrlCreateMenuItem("Corsair iCUE", $hHardware)
+			Local $hLogi = GUICtrlCreateMenuItem("Logitech", $hHardware)
 			Local $hMSMK = GUICtrlCreateMenuItem("Microsft Mouse && Keyboard", $hHardware)
 		Local $hLaunchers = GUICtrlCreateMenu("Launchers", $hExclude)
 			Local $hEpik = GUICtrlCreateMenuItem("Epic Games", $hLaunchers)
@@ -130,7 +131,7 @@ Func Main()
 			Local $hReFreeze = GUICtrlCreateCheckbox("Refreeze Inactive Thawed Windows", 27, 135, 286, 15)
 				GUICtrlSetState(-1, $GUI_DISABLE)
 
-		Local $hThawCycle = GUICtrlCreateCheckbox("Thaw/Refreeze Processes (BETA)", 12, 155, 296, 15)
+		Local $hThawCycle = GUICtrlCreateCheckbox("Thaw/Refreeze Processes", 12, 155, 296, 15)
 			GUICtrlCreateLabel(Chrw(9625), 12, 170, 15, 15, $SS_CENTER)
 			GUICtrlSetState(-1, $GUI_DISABLE)
 			GUICtrlCreateLabel("Every", 27, 171, 30, 15)
@@ -186,7 +187,7 @@ Func Main()
 				FileWrite(".\export.csv", "[SERVICES]" & @CRLF)
 				FileWrite(".\export.csv", _ArrayToString(_ServicesList(), ",") & @CRLF)
 
-			Case $hBE, $hEAC, $hAMD To $hXSplit, $hChrome to $hMSIE, $hCorsiar, $hMSMK, $hEpik to $hXbox, $hDiscord, $hMSPT, $hOculus To $hWinMR
+			Case $hBE, $hEAC, $hAMD To $hXSplit, $hChrome to $hMSIE, $hCorsiar to $hMSMK, $hEpik to $hXbox, $hDiscord, $hMSPT, $hOculus To $hWinMR
 				If _IsChecked($hMsg) Then
 					GUICtrlSetState($hMsg, $GUI_UNCHECKED)
 					Switch $hMsg
@@ -259,6 +260,9 @@ Func Main()
 							_ArrayRemove($aServicesExclusions, "CorsairGamingAudioConfig")
 							_ArrayRemove($aServicesExclusions, "CorsairLLAService")
 							_ArrayRemove($aServicesExclusions, "CorsairService")
+						Case $hLogi
+							_ArrayRemove($aProcessExclusions, "")
+							_ArrayRemove($aServicesExclusions, "")
 						Case $hMSMK
 							_ArrayRemove($aProcessExclusions, "MKCHelper.exe")
 							_ArrayRemove($aProcessExclusions, "ipoint.exe")
@@ -384,6 +388,9 @@ Func Main()
 							_ArrayAdd($aServicesExclusions, "CorsairGamingAudioConfig")
 							_ArrayAdd($aServicesExclusions, "CorsairLLAService")
 							_ArrayAdd($aServicesExclusions, "CorsairService")
+						Case $hLogi
+							_ArrayAdd($aProcessExclusions, "")
+							_ArrayAdd($aServicesExclusions, "")
 						Case $hMSMK
 							_ArrayAdd($aProcessExclusions, "MKCHelper.exe")
 							_ArrayAdd($aProcessExclusions, "ipoint.exe")
@@ -647,13 +654,13 @@ Func _FreezeToStock($aProcessExclusions, $bIncludeServices, $aServicesExclusions
 									"Audiosrv", _ ; Windows Audio
 									"BFE", _ ; Base Filtering Engine
 									"BrokerInfrastructure", _ ; Background Tasks Infrastructure Service
-									"camsvc", _ ; Capability Access Manager Service
-									"CertPropSvc", _ ; Certificate Propagation
+									"camsvc", _ ; Capability Access Manager Service...Stoppable?
+									"CertPropSvc", _ ; Certificate Propagation....Stoppable?
 									"CoreMessagingRegistrar", _ ; CoreMessaging
 									"CryptSvc", _ ; Cryptographic Services
 									"DcomLaunch", _ ; DCOM Server Process Launcher
 									"Dhcp", _ ; DHCP Client
-									"DispBrokerDesktopSvc", _ ; Display Policy Service
+									"DispBrokerDesktopSvc", _ ; Display Policy Service...Stoppable?
 									"Dnscache", _ ; DNS Client
 									"DPS", _ ; Diagnostic Policy Service
 									"DusmSvc", _ ; Data Usage
@@ -676,34 +683,34 @@ Func _FreezeToStock($aProcessExclusions, $bIncludeServices, $aServicesExclusions
 									"PlugPlay", _ ; Plug and Play
 									"Power", _ ; Power
 									"ProfSvc", _ ; User Profile Service
-									"RmSvc", _ ; Radio Management Service
+									"RmSvc", _ ; Radio Management Service...Stoppable?
 									"RpcEptMapper", _ ; RPC Endpoint Mapper
 									"RpcSs", _ ; Remote Procedure Call
 									"SamSs", _ ; Security Accounts Manager
 									"Schedule", _ ; Task Scheduler
 									"SecurityHealthService", _ ; Windows Security Service
 									"SENS", _ ; System Event Notification Service
-									"SessionEvc", _ ; Remote Desktop Configuration
+									"SessionEvc", _ ; Remote Desktop Configuration...Stoppable?
 									"SgrmBroker", _ ; System Guard Runtime Monitor Broker
 									"ShellHWDetection", _ ; Shell Hardware Detection
 									"StateRepository", _ ; State Repository Service
-									"StorSvc", _ ; Storage Service
-									"swprv", _ ; Microsoft Software Shadow Copy Provider
+									"StorSvc", _ ; Storage Service...Stoppable?
+									"swprv", _ ; Microsoft Software Shadow Copy Provider....Stoppable?
 									"SysMain", _ ; SysMain
 									"SystemEventsBroker", _ ; System Events Broker
 									"TabletInputService", _ ; Touch Keyboard and Handwriting Panel Service
-									"TermService", _ ; Remote Desktop Services
+									"TermService", _ ; Remote Desktop Services...Stoppable?
 									"Themes", _ ; Themes
 									"TimeBrokerSvc", _ ; Time Broker
 									"TokenBroker", _ ; Web Account Manager
-									"TrkWks", _ ; Distributed Link Tracking Client"
-									"UmRdpService", _ ; Remote Desktop Services UserMode Port Redirector
+									"TrkWks", _ ; Distributed Link Tracking Client
+									"UmRdpService", _ ; Remote Desktop Services UserMode Port Redirector...Stoppable?
 									"UserManager", _ ; User Manager
 									"UsoSvc", _ ; Update Orchestreator Service
 									"VaultSvc", _ ; Credential Manager
 									"VSS", _ ; Volume Shadow Copy
-									"WarpJITSvc", _ ; WarpJITSvc
-									"WbioSrvc", _ ; Windows Biometric Service
+									"WarpJITSvc", _ ; WarpJITSvc...Stoppable
+									"WbioSrvc", _ ; Windows Biometric Service...Stoppable
 									"Wcmsvc", _ ; Windows Connection Manager
 									"WdiServiceHost", _ ; Diagnostic Service Host
 									"WdiSystemHost", _ ; Diagnostic System Host
