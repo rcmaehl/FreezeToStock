@@ -79,6 +79,7 @@ Func Main()
 		Local $hHardware = GUICtrlCreateMenu("Hardware", $hExclude)
 			Local $hCorsiar = GUICtrlCreateMenuItem("Corsair iCUE", $hHardware)
 			Local $hLogi = GUICtrlCreateMenuItem("Logitech", $hHardware)
+				GUICtrlSetState(-1, $GUI_DISABLE)
 			Local $hMSMK = GUICtrlCreateMenuItem("Microsft Mouse && Keyboard", $hHardware)
 		Local $hLaunchers = GUICtrlCreateMenu("Launchers", $hExclude)
 			Local $hEpik = GUICtrlCreateMenuItem("Epic Games", $hLaunchers)
@@ -118,6 +119,7 @@ Func Main()
 		Local $hServices = GUICtrlCreateCheckbox("Freeze Services as well as Processes", 12, 85, 296, 15)
 			GUICtrlSetTip(-1, "Include Services for stronger results")
 			GUICtrlCreateLabel(Chrw(9625), 12, 100, 15, 15, $SS_CENTER)
+			GUICtrlSetState(-1, $GUI_DISABLE)
 			Local $hAggressive = GUICtrlCreateCheckbox("Stop Services instead of just Pausing", 27, 100, 286, 15)
 				GUICtrlSetState(-1, $GUI_DISABLE)
 				GUICtrlSetTip(-1, _
@@ -261,8 +263,8 @@ Func Main()
 							_ArrayRemove($aServicesExclusions, "CorsairLLAService")
 							_ArrayRemove($aServicesExclusions, "CorsairService")
 						Case $hLogi
-							_ArrayRemove($aProcessExclusions, "")
-							_ArrayRemove($aServicesExclusions, "")
+							_ArrayRemove($aProcessExclusions, "KHALMNPR.exe")
+							_ArrayRemove($aProcessExclusions, "SetPoint.exe")
 						Case $hMSMK
 							_ArrayRemove($aProcessExclusions, "MKCHelper.exe")
 							_ArrayRemove($aProcessExclusions, "ipoint.exe")
@@ -389,8 +391,8 @@ Func Main()
 							_ArrayAdd($aServicesExclusions, "CorsairLLAService")
 							_ArrayAdd($aServicesExclusions, "CorsairService")
 						Case $hLogi
-							_ArrayAdd($aProcessExclusions, "")
-							_ArrayAdd($aServicesExclusions, "")
+							_ArrayAdd($aProcessExclusions, "KHALMNPR.exe")
+							_ArrayAdd($aProcessExclusions, "SetPoint.exe")
 						Case $hMSMK
 							_ArrayAdd($aProcessExclusions, "MKCHelper.exe")
 							_ArrayAdd($aProcessExclusions, "ipoint.exe")
@@ -501,6 +503,7 @@ Func Main()
 					GUICtrlSetState($hServices, $GUI_ENABLE)
 					If _IsChecked($hServices) Then GUICtrlSetState($hAggressive, $GUI_ENABLE)
 					GUICtrlSetState($hThawCycle, $GUI_ENABLE)
+					If _IsChecked($hThawCycle) Then GUICtrlSetState($hThawCycle + 1, $GUI_ENABLE)
 					GUICtrlSetData($hToggle, " FREEZE SYSTEM")
 				EndIf
 				GUICtrlSetState($hToggle, $GUI_ENABLE)
@@ -523,6 +526,12 @@ Func Main()
 					GUICtrlSetState($hReFreeze, $GUI_DISABLE)
 				EndIf
 
+			Case $hThawCycle
+				If _IsChecked($hThawCycle) Then
+					GUICtrlSetState($hThawCycle + 1, $GUI_ENABLE)
+				Else
+					GUICtrlSetState($hThawCycle + 1, $GUI_DISABLE)
+				EndIf
 			Case $hGithub
 				ShellExecute("https://github.com/rcmaehl/FreezeToStock")
 
