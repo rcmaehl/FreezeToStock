@@ -5,8 +5,8 @@
 #AutoIt3Wrapper_UseX64=y
 #AutoIt3Wrapper_Res_Comment=Compiled 09/08/2020 @ ~13:35 EST
 #AutoIt3Wrapper_Res_Description=Freeze To Stock
-#AutoIt3Wrapper_Res_Fileversion=1.1
-#AutoIt3Wrapper_Res_ProductVersion=1.1
+#AutoIt3Wrapper_Res_Fileversion=1.2
+#AutoIt3Wrapper_Res_ProductVersion=1.2
 #AutoIt3Wrapper_Res_LegalCopyright=Robert Maehl, using LGPL 3 License
 #AutoIt3Wrapper_Res_Language=1033
 #AutoIt3Wrapper_Res_requestedExecutionLevel=highestAvailable
@@ -90,7 +90,7 @@ Func Main()
 		Local $hSocial = GUICtrlCreateMenu("Social", $hExclude)
 			Local $hDiscord = GUICtrlCreateMenuItem("Discord", $hSocial)
 		Local $hTools = GUICtrlCreateMenu("Tools", $hExclude)
-			Local $hMSPT = GUICtrlCreateMenuItem("Powertoys", $hTools)
+			Local $hMSPT = GUICtrlCreateMenuItem("Microsoft Powertoys", $hTools)
 		Local $hVirtualR = GUICtrlCreateMenu("Virtual Reality", $hExclude)
 			Local $hOculus = GUICtrlCreateMenuItem("Oculus", $hVirtualR)
 			Local $hSteamVR = GUICtrlCreateMenuItem("SteamVR (+ HTC)", $hVirtualR)
