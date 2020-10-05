@@ -134,6 +134,7 @@ Func Main()
 				GUICtrlSetState(-1, $GUI_DISABLE)
 
 		Local $hThawCycle = GUICtrlCreateCheckbox("Thaw/Refreeze Processes", 12, 155, 296, 15)
+			GUICtrlSetTip(-1, "Intermittently Thaw Frozen Processes so they can process pending data")
 			GUICtrlCreateLabel(Chrw(9625), 12, 170, 15, 15, $SS_CENTER)
 			GUICtrlSetState(-1, $GUI_DISABLE)
 			GUICtrlCreateLabel("Every", 27, 171, 30, 15)
