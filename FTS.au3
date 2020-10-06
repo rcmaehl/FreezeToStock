@@ -3,7 +3,7 @@
 #AutoIt3Wrapper_Version=Beta
 #AutoIt3Wrapper_Icon=.\icon.ico
 #AutoIt3Wrapper_UseX64=y
-#AutoIt3Wrapper_Res_Comment=Compiled 09/08/2020 @ ~13:35 EST
+#AutoIt3Wrapper_Res_Comment=Compiled 10/05/2020 @ ~21:00 EST
 #AutoIt3Wrapper_Res_Description=Freeze To Stock
 #AutoIt3Wrapper_Res_Fileversion=1.2
 #AutoIt3Wrapper_Res_ProductVersion=1.2
@@ -105,7 +105,6 @@ Func Main()
 	Local $hHelp = GUICtrlCreateMenu("Help")
 	Local $hGithub = GUICtrlCreateMenuItem("Github", $hHelp)
 	Local $hDisWeb = GUICtrlCreateMenuItem("Discord", $hHelp)
-		GUICtrlSetState(-1, $GUI_DISABLE)
 	GUICtrlCreateMenuItem("", $hHelp)
 	Local $hDonate = GUICtrlCreateMenuItem("Donate", $hHelp)
 	GUICtrlCreateMenuItem("", $hHelp)
@@ -126,17 +125,16 @@ Func Main()
 					"This will give stronger results for lower powered devices," & _
 					@CRLF & "Services will automatically be restarted for you.")
 
-		Local $hThawTop = GUICtrlCreateCheckbox("Thaw Active Window (Coming Soon)", 12, 120, 296, 15)
+		Local $hThawTop = GUICtrlCreateCheckbox("Dynamically Thaw Active Window (Coming Soon)", 12, 120, 296, 15)
 			GUICtrlSetState(-1, $GUI_DISABLE)
 			GUICtrlCreateLabel(Chrw(9625), 12, 135, 15, 15, $SS_CENTER)
 			GUICtrlSetState(-1, $GUI_DISABLE)
 			Local $hReFreeze = GUICtrlCreateCheckbox("Refreeze Inactive Thawed Windows", 27, 135, 286, 15)
 				GUICtrlSetState(-1, $GUI_DISABLE)
 
-		Local $hThawCycle = GUICtrlCreateCheckbox("Thaw/Refreeze Processes", 12, 155, 296, 15)
-			GUICtrlSetTip(-1, "Intermittently Thaw Frozen Processes so they can process pending data")
+		Local $hThawCycle = GUICtrlCreateCheckbox("Periodically Thaw Frozen Processes", 12, 155, 296, 15)
+			GUICtrlSetTip(-1, "This allows frozen processes to process any pending data")
 			GUICtrlCreateLabel(Chrw(9625), 12, 170, 15, 15, $SS_CENTER)
-			GUICtrlSetState(-1, $GUI_DISABLE)
 			GUICtrlCreateLabel("Every", 27, 171, 30, 15)
 			Local $hCycle = GUICtrlCreateInput("60", 57, 170, 40, 15, $ES_READONLY)
 				GUICtrlCreateUpdown(-1,$UDS_ARROWKEYS+$UDS_SETBUDDYINT)
@@ -146,6 +144,12 @@ Func Main()
 				GUICtrlCreateUpdown(-1,$UDS_ARROWKEYS+$UDS_SETBUDDYINT)
 				GUICtrlSetLimit(-1, 60, 5)
 			GUICtrlCreateLabel("Seconds", 206, 171, 45, 15)
+			For $iLoop = 1 To 8 Step 1
+				GUICtrlSetState($hThawCycle + $iLoop, $GUI_DISABLE)
+				GUICtrlSetTip($hThawCycle + $iLoop, _
+					"How often to thaw processes and for how long, " & _
+					@CRLF & "This setting can be modified during Freeze.")
+			Next
 
 	$hStatus = _GUICtrlStatusBar_Create($hGUI, $aStatusSize)
 	GUISetState(@SW_SHOW, $hGUI)
@@ -529,9 +533,13 @@ Func Main()
 
 			Case $hThawCycle
 				If _IsChecked($hThawCycle) Then
-					GUICtrlSetState($hThawCycle + 1, $GUI_ENABLE)
+					For $iLoop = 1 To 8 Step 1
+						GUICtrlSetState($hThawCycle + $iLoop, $GUI_ENABLE)
+					Next
 				Else
-					GUICtrlSetState($hThawCycle + 1, $GUI_DISABLE)
+					For $iLoop = 1 To 8 Step 1
+						GUICtrlSetState($hThawCycle + $iLoop, $GUI_DISABLE)
+					Next
 				EndIf
 			Case $hGithub
 				ShellExecute("https://github.com/rcmaehl/FreezeToStock")
