@@ -3,7 +3,7 @@
 #AutoIt3Wrapper_Version=Beta
 #AutoIt3Wrapper_Icon=.\icon.ico
 #AutoIt3Wrapper_UseX64=y
-#AutoIt3Wrapper_Res_Comment=Compiled 10/05/2020 @ ~21:00 EST
+#AutoIt3Wrapper_Res_Comment=Compiled 10/09/2020 @ ~2:15 EST
 #AutoIt3Wrapper_Res_Description=Freeze To Stock
 #AutoIt3Wrapper_Res_Fileversion=1.2
 #AutoIt3Wrapper_Res_ProductVersion=1.2
