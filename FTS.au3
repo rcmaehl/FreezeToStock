@@ -119,7 +119,7 @@ Func Main()
 			GUICtrlSetTip(-1, "This Pauses known unneeded System Services")
 			GUICtrlCreateLabel(Chrw(9625), 12, 100, 15, 15, $SS_CENTER)
 			GUICtrlSetState(-1, $GUI_DISABLE)
-			Local $hAggressive = GUICtrlCreateCheckbox("Stop Services instead of Pausing", 27, 100, 286, 15)
+			Local $hAggressive = GUICtrlCreateCheckbox("Stop Services instead of just Pausing", 27, 100, 286, 15)
 				GUICtrlSetState(-1, $GUI_DISABLE)
 				GUICtrlSetTip(-1, _
 					"This will give stronger results for lower powered devices," & _
