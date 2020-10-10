@@ -3,7 +3,7 @@
 #AutoIt3Wrapper_Version=Beta
 #AutoIt3Wrapper_Icon=.\icon.ico
 #AutoIt3Wrapper_UseX64=y
-#AutoIt3Wrapper_Res_Comment=Compiled 10/09/2020 @ ~14:15 EST
+#AutoIt3Wrapper_Res_Comment=Compiled 10/10/2020 @ ~16:00 EST
 #AutoIt3Wrapper_Res_Description=Freeze To Stock
 #AutoIt3Wrapper_Res_Fileversion=1.2
 #AutoIt3Wrapper_Res_ProductVersion=1.2
@@ -119,7 +119,7 @@ Func Main()
 			GUICtrlSetTip(-1, "This Pauses known unneeded System Services")
 			GUICtrlCreateLabel(Chrw(9625), 12, 100, 15, 15, $SS_CENTER)
 			GUICtrlSetState(-1, $GUI_DISABLE)
-			Local $hAggressive = GUICtrlCreateCheckbox("This Stops Services instead of just Pausing", 27, 100, 286, 15)
+			Local $hAggressive = GUICtrlCreateCheckbox("Stop Services instead of Pausing", 27, 100, 286, 15)
 				GUICtrlSetState(-1, $GUI_DISABLE)
 				GUICtrlSetTip(-1, _
 					"This will give stronger results for lower powered devices," & _
