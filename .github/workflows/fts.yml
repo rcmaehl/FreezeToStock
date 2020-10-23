@@ -23,7 +23,7 @@ jobs:
            Move-Item Include Aut2Exe\FreezeToStock
            cd Aut2Exe
            Move-Item aut2exe.exe FreezeToStock
-           cd NotCPUCores
+           cd FreezeToStock
            ./Aut2exe.exe /in FTS.au3 /out FTS.exe /comp 4 /nopack /icon icon.ico
 
 
