@@ -19,6 +19,7 @@
 #include <Misc.au3>
 #include <Array.au3>
 #include <String.au3>
+#include <WinAPIProc.au3>
 #include <GUIStatusBar.au3>
 #include <EditConstants.au3>
 #include <GUIConstantsEx.au3>
@@ -76,6 +77,7 @@ Func Main()
 			Local $hEdge = GUICtrlCreateMenuItem("Edge (New)", $hBrowsers)
 			Local $hFirefox = GUICtrlCreateMenuItem("Firefox", $hBrowsers)
 			Local $hMSIE = GUICtrlCreateMenuItem("IE", $hBrowsers)
+			Local $hOpera = GUICtrlCreateMenuItem("Opera", $hBrowsers)
 		Local $hHardware = GUICtrlCreateMenu("Hardware", $hExclude)
 			Local $hCorsiar = GUICtrlCreateMenuItem("Corsair iCUE", $hHardware)
 			Local $hLogi = GUICtrlCreateMenuItem("Logitech", $hHardware)
@@ -194,7 +196,7 @@ Func Main()
 				FileWrite(".\export.csv", "[SERVICES]" & @CRLF)
 				FileWrite(".\export.csv", _ArrayToString(_ServicesList(), ",") & @CRLF)
 
-			Case $hBE, $hEAC, $hAMD To $hXSplit, $hChrome to $hMSIE, $hCorsiar to $hMSMK, $hEpik to $hXbox, $hDiscord, $hMSPT, $hOculus To $hWinMR
+			Case $hBE, $hEAC, $hAMD To $hXSplit, $hChrome to $hOpera, $hCorsiar to $hMSMK, $hEpik to $hXbox, $hDiscord, $hMSPT, $hOculus To $hWinMR
 				If _IsChecked($hMsg) Then
 					GUICtrlSetState($hMsg, $GUI_UNCHECKED)
 					Switch $hMsg
@@ -851,10 +853,10 @@ Func _LoadCustom($sFile, ByRef $aProcessExclusions, ByRef $aServicesExclusions)
 EndFunc
 
 Func _ProcessSuspend($iPID)
-	$ai_Handle = DllCall("kernel32.dll", 'int', 'OpenProcess', 'int', 0x1f0fff, 'int', False, 'int', $iPID)
-	$i_success = DllCall("ntdll.dll", "int", "NtSuspendProcess", "int", $ai_Handle[0])
-	DllCall('kernel32.dll', 'ptr', 'CloseHandle', 'ptr', $ai_Handle)
-	If IsArray($i_success) Then
+	$hProcess = _WinAPI_OpenProcess($PROCESS_SUSPEND_RESUME, False, $iPID)
+	$iSuccess = DllCall("ntdll.dll", "int", "NtSuspendProcess", "int", $hProcess)
+	_WinAPI_CloseHandle($hProcess)
+	If IsArray($iSuccess) Then
 		Return 1
 	Else
 		SetError(1)
@@ -863,10 +865,10 @@ Func _ProcessSuspend($iPID)
 EndFunc
 
 Func _ProcessResume($iPID)
-	$ai_Handle = DllCall("kernel32.dll", 'int', 'OpenProcess', 'int', 0x1f0fff, 'int', False, 'int', $iPID)
-	$i_success = DllCall("ntdll.dll", "int", "NtResumeProcess", "int", $ai_Handle[0])
-	DllCall('kernel32.dll', 'ptr', 'CloseHandle', 'ptr', $ai_Handle)
-	If IsArray($i_success) Then
+	$hProcess = _WinAPI_OpenProcess($PROCESS_SUSPEND_RESUME, False, $iPID)
+	$iSuccess = DllCall("ntdll.dll", "int", "NtResumeProcess", "int", $hProcess)
+	_WinAPI_CloseHandle($hProcess)
+	If IsArray($iSuccess) Then
 		Return 1
 	Else
 		SetError(1)
