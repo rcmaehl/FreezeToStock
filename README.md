@@ -5,7 +5,7 @@
 [![Join the Discord chat](https://img.shields.io/badge/Discord-chat-7289da.svg?&logo=discord)](https://discord.gg/uBnBcBx)
 
 # FreezeToStock
-Temporarily Pause Non-Required Processes and Services before Gaming
+Temporarily Pause Non-Required Processes and Services before Gaming  | [Download Under Releases](https://github.com/rcmaehl/FreezeToStock/releases)
 
 ![](https://i.imgur.com/1hMLT9W.png)
 
