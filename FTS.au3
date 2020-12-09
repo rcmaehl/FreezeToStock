@@ -93,7 +93,7 @@ Func Main()
 		Local $hTools = GUICtrlCreateMenu("Tools", $hExclude)
 			Local $hMSPT = GUICtrlCreateMenuItem("Microsoft Powertoys", $hTools)
 			Local $hNBFC = GUICtrlCreateMenuItem("NoteBook FanControl", $hTools)
-			Local $hTShop = GUICtrlCreateMenuItem("ThrottleStop", $hTools)
+			Local $hTStop = GUICtrlCreateMenuItem("ThrottleStop", $hTools)
 		Local $hVirtualR = GUICtrlCreateMenu("Virtual Reality", $hExclude)
 			Local $hOculus = GUICtrlCreateMenuItem("Oculus", $hVirtualR)
 			Local $hSteamVR = GUICtrlCreateMenuItem("SteamVR (+ HTC)", $hVirtualR)
@@ -305,6 +305,11 @@ Func Main()
 							_ArrayRemove($aProcessExclusions, "FancyZonesEditor.exe")
 							_ArrayRemove($aProcessExclusions, "ImageResizer.exe")
 							_ArrayRemove($aProcessExclusions, "PowerLauncher.exe")
+						Case $hNBFC
+							_ArrayRemove($aProcessExclusions, "NoteBookFanControl.exe")
+							_ArrayRemove($aServicesExclusions, "NbfcService")
+						Case $hTStop
+							_ArrayRemove($aProcessExclusions, "ThrottleStop.exe")
 						Case $hOculus
 							_ArrayRemove($aProcessExclusions, "OVRLibraryService.exe")
 							_ArrayRemove($aProcessExclusions, "OVRServiceLauncher.exe")
@@ -325,11 +330,6 @@ Func Main()
 							_ArrayRemove($aProcessExclusions, "Cortanalistenui.exe")
 							_ArrayRemove($aProcessExclusions, "DesktopView.exe")
 							_ArrayRemove($aProcessExclusions, "EnvironmentsApp.exe")
-						Case $hThrottleStop
-							_ArrayRemove($aProcessExclusions, "ThrottleStop.exe")
-						Case $hNbfc
-							_ArrayRemove($aProcessExclusions, "NoteBookFanControl.exe")
-							_ArrayRemove($aServicesExclusions, "NbfcService")
 					EndSwitch
 				Else
 					GUICtrlSetState($hMsg, $GUI_CHECKED)
