@@ -81,7 +81,6 @@ Func Main()
 		Local $hHardware = GUICtrlCreateMenu("Hardware", $hExclude)
 			Local $hCorsiar = GUICtrlCreateMenuItem("Corsair iCUE", $hHardware)
 			Local $hLogi = GUICtrlCreateMenuItem("Logitech", $hHardware)
-				GUICtrlSetState(-1, $GUI_DISABLE)
 			Local $hMSMK = GUICtrlCreateMenuItem("Microsft Mouse && Keyboard", $hHardware)
 		Local $hLaunchers = GUICtrlCreateMenu("Launchers", $hExclude)
 			Local $hEpik = GUICtrlCreateMenuItem("Epic Games", $hLaunchers)
@@ -93,6 +92,8 @@ Func Main()
 			Local $hDiscord = GUICtrlCreateMenuItem("Discord", $hSocial)
 		Local $hTools = GUICtrlCreateMenu("Tools", $hExclude)
 			Local $hMSPT = GUICtrlCreateMenuItem("Microsoft Powertoys", $hTools)
+			Local $hNBFC = GUICtrlCreateMenuItem("NoteBook FanControl", $hTools)
+			Local $hTShop = GUICtrlCreateMenuItem("ThrottleStop", $hTools)
 		Local $hVirtualR = GUICtrlCreateMenu("Virtual Reality", $hExclude)
 			Local $hOculus = GUICtrlCreateMenuItem("Oculus", $hVirtualR)
 			Local $hSteamVR = GUICtrlCreateMenuItem("SteamVR (+ HTC)", $hVirtualR)
@@ -196,7 +197,7 @@ Func Main()
 				FileWrite(".\export.csv", "[SERVICES]" & @CRLF)
 				FileWrite(".\export.csv", _ArrayToString(_ServicesList(), ",") & @CRLF)
 
-			Case $hBE, $hEAC, $hAMD To $hXSplit, $hChrome to $hOpera, $hCorsiar to $hMSMK, $hEpik to $hXbox, $hDiscord, $hMSPT, $hOculus To $hWinMR
+			Case $hBE, $hEAC, $hAMD To $hXSplit, $hChrome to $hOpera, $hCorsiar to $hMSMK, $hEpik to $hXbox, $hDiscord, $hMSPT to $hTStop, $hOculus To $hWinMR
 				If _IsChecked($hMsg) Then
 					GUICtrlSetState($hMsg, $GUI_UNCHECKED)
 					Switch $hMsg
@@ -324,6 +325,11 @@ Func Main()
 							_ArrayRemove($aProcessExclusions, "Cortanalistenui.exe")
 							_ArrayRemove($aProcessExclusions, "DesktopView.exe")
 							_ArrayRemove($aProcessExclusions, "EnvironmentsApp.exe")
+						Case $hThrottleStop
+							_ArrayRemove($aProcessExclusions, "ThrottleStop.exe")
+						Case $hNbfc
+							_ArrayRemove($aProcessExclusions, "NoteBookFanControl.exe")
+							_ArrayRemove($aServicesExclusions, "NbfcService")
 					EndSwitch
 				Else
 					GUICtrlSetState($hMsg, $GUI_CHECKED)
@@ -432,6 +438,11 @@ Func Main()
 							_ArrayAdd($aProcessExclusions, "FancyZonesEditor.exe")
 							_ArrayAdd($aProcessExclusions, "ImageResizer.exe")
 							_ArrayAdd($aProcessExclusions, "PowerLauncher.exe")
+						Case $hNBFC
+							_ArrayAdd($aProcessExclusions, "NoteBookFanControl.exe")
+							_ArrayAdd($aServicesExclusions, "NbfcService")
+						Case $hTSTOP
+							_ArrayAdd($aProcessExclusions, "ThrottleStop.exe")
 						Case $hOculus
 							_ArrayAdd($aProcessExclusions, "OVRLibraryService.exe")
 							_ArrayAdd($aProcessExclusions, "OVRServiceLauncher.exe")
@@ -934,7 +945,7 @@ Func _ServicesList() ;
         If @error Then ExitLoop
         Sleep(10)
     WEnd
-    $a = StringRegExp($st,'(?m)(?i)(?s)(?:SERVICE_NAME|NOME_SERVI€O)\s*?:\s+?(\w+).+?(?:STATE|ESTADO)\s+?:\s+?\d+?\s+?(\w+)',3)
+    $a = StringRegExp($st,'(?m)(?i)(?s)(?:SERVICE_NAME|NOME_SERVIÂ€O)\s*?:\s+?(\w+).+?(?:STATE|ESTADO)\s+?:\s+?\d+?\s+?(\w+)',3)
     For $x = 0 To UBound($a)-1 Step 2
         ReDim $aServicesList[UBound($aServicesList)+1][2]
         $aServicesList[UBound($aServicesList)-1][0]=$a[$x]
