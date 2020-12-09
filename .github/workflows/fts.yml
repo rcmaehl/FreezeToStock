@@ -24,7 +24,7 @@ jobs:
            cd Aut2Exe
            Move-Item aut2exe.exe FreezeToStock
            cd FreezeToStock
-           ./Aut2exe.exe /in FTS.au3 /out FTS.exe /comp 4 /nopack /icon icon.ico
+           ./Aut2exe.exe /in FTS.au3 /out FTS.exe /x64 /comp 4 /nopack /icon icon.ico
 
 
     - name: Upload
