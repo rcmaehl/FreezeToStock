@@ -3,10 +3,10 @@
 #AutoIt3Wrapper_Version=Beta
 #AutoIt3Wrapper_Icon=.\icon.ico
 #AutoIt3Wrapper_UseX64=y
-#AutoIt3Wrapper_Res_Comment=Compiled 10/10/2020 @ ~16:00 EST
+#AutoIt3Wrapper_Res_Comment=Compiled 12/12/2020 @ ~1:35 EST
 #AutoIt3Wrapper_Res_Description=Freeze To Stock
-#AutoIt3Wrapper_Res_Fileversion=1.2
-#AutoIt3Wrapper_Res_ProductVersion=1.2
+#AutoIt3Wrapper_Res_Fileversion=1.2.1
+#AutoIt3Wrapper_Res_ProductVersion=1.2.1
 #AutoIt3Wrapper_Res_LegalCopyright=Robert Maehl, using LGPL 3 License
 #AutoIt3Wrapper_Res_Language=1033
 #AutoIt3Wrapper_Res_requestedExecutionLevel=highestAvailable
@@ -39,7 +39,7 @@ Main()
 
 Func Main()
 
-	Local $sVersion = "1.2"
+	Local $sVersion = "1.2.1"
 
 	Local $aStatusSize[2] = [75, -1]
 
@@ -262,6 +262,8 @@ Func Main()
 							_ArrayRemove($aProcessExclusions, "firefox.exe")
 						Case $hMSIE
 							_ArrayRemove($aProcessExclusions, "iexplore.exe")
+						Case $hOpera
+							_ArrayRemove($aProcessExclusions, "opera.exe")
 						Case $hCorsiar
 							_ArrayRemove($aProcessExclusions, "Corsair.Service.CpuIdRemote64.exe")
 							_ArrayRemove($aProcessExclusions, "Corsair.Service.DisplayAdapter.exe")
@@ -395,6 +397,8 @@ Func Main()
 							_ArrayAdd($aProcessExclusions, "firefox.exe")
 						Case $hMSIE
 							_ArrayAdd($aProcessExclusions, "iexplore.exe")
+						Case $hOpera
+							_ArrayAdd($aProcessExclusions, "opera.exe")
 						Case $hCorsiar
 							_ArrayAdd($aProcessExclusions, "Corsair.Service.CpuIdRemote64.exe")
 							_ArrayAdd($aProcessExclusions, "Corsair.Service.DisplayAdapter.exe")
