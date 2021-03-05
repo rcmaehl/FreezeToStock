@@ -39,6 +39,46 @@ Main()
 
 Func Main()
 
+	Local $hState = _GetStateFile()
+
+	ConsoleWrite($hState & @CRLF)
+
+	Switch $hState
+
+		Case False
+			;;;
+
+		Case True
+			If IsString($hState) Then ContinueCase
+			If MsgBox($MB_YESNO+$MB_ICONWARNING+$MB_TOPMOST, "State File could not be read", "A previous unthawed session was detected but its details could not be read. " & _
+				"This may cause issues with freezing or thawing. Please delete the '.frozen' file or run the application as an administrator to resolve. " & _
+				"Would you like to continue?") = $IDYES Then ;;;
+			Else
+				Exit 1
+			EndIf
+
+		Case Else
+			Switch MsgBox($MB_YESNOCANCEL+$MB_ICONQUESTION+$MB_TOPMOST, "Previous Session Exists", "A previous unthawed session from " & $hState & " was found." & @CRLF & _
+				@CRLF & _
+				"Would you like to thaw it?" & @CRLF & _
+				"The session will be deleted to prevent conflicts." & @CRLF & _
+				"To exit immediately and take other action, choose Cancel.")
+
+				Case $IDYES
+					_ReadStateFile()
+
+				Case $IDNO
+					_RemoveStateFile()
+
+				Case $IDCancel
+					Exit 1
+
+
+			EndSwitch
+
+	EndSwitch
+
+
 	Local $sVersion = "1.2.1"
 
 	Local $aStatusSize[2] = [75, -1]
@@ -843,6 +883,19 @@ Func _GetLatestRelease($sCurrent)
 
 EndFunc
 
+Func _GetStateFile()
+	If FileExists(".frozen") Then
+		Local $hStateFile = FileOpen(".frozen", $FO_READ)
+		If $hStateFile = -1 Then
+			Return True
+		EndIf
+		Return FileReadLine($hStateFile, 1)
+	Else
+		Return False
+	EndIf
+EndFunc
+
+
 Func _IsChecked($idControlID)
     Return BitAND(GUICtrlRead($idControlID), $GUI_CHECKED) = $GUI_CHECKED
 EndFunc   ;==>_IsChecked
@@ -907,6 +960,14 @@ Func _ProcessResume($iPID)
 		Return 0
 	EndIf
 EndFunc
+
+Func _ReadStateFile()
+EndFunc
+
+Func _RemoveStateFile()
+	FileDelete(".frozen")
+EndFunc
+
 
 Func _RemoveCustom($sFile, ByRef $aProcessExclusions, ByRef $aServicesExclusions)
 
@@ -1028,7 +1089,12 @@ Func _ThawFromStock($aProcessExclusions, $bIncludeServices, $aServicesSnapshot, 
 		EndIf
 	Next
 
+	_RemoveStateFile()
+
 	_GUICtrlStatusBar_SetText($hOutput, "", 0)
 	_GUICtrlStatusBar_SetText($hOutput, "", 1)
 
+EndFunc
+
+Func WriteStateFile()
 EndFunc
