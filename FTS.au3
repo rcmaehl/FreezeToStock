@@ -55,6 +55,9 @@ Func Main()
 	Local $hGUI = GUICreate("FreezeToStock", 320, 240, -1, -1, BitOr($WS_MINIMIZEBOX, $WS_CAPTION, $WS_SYSMENU))
 
 	Local $hFile = GUICtrlCreateMenu("File")
+		Local $hDebug  = GUICtrlCreateMenu("Recovery", $hFile)
+			Local $hThawAll = GUICtrlCreateMenuItem("Thaw All", $hDebug)
+			Local $hThawProc = GUICtrlCreateMenuItem("Thaw Processes", $hDebug)
 		Local $hExport = GUICtrlCreateMenuItem("Export", $hFile)
 		GUICtrlCreateMenuItem("", $hFile)
 		Local $hQuit = GUICtrlCreateMenuItem("Quit", $hFile)
@@ -189,6 +192,14 @@ Func Main()
 				_GUICtrlStatusBar_Destroy($hGUI)
 				GUIDelete($hGUI)
 				Exit
+
+			Case $hThawProc
+				_ThawFromStock($aProcessExclusions, False, "", False, $hStatus)
+				_ThawFromStock($aProcessExclusions, False, "", True, $hStatus)
+
+			Case $hThawAll
+				_ThawFromStock($aProcessExclusions, True, "", False, $hStatus)
+				_ThawFromStock($aProcessExclusions, True, "", True, $hStatus)
 
 			Case $hExport
 				FileDelete(".\export.csv")
@@ -511,7 +522,7 @@ Func Main()
 			Case $hToggle
 				GUICtrlSetState($hToggle, $GUI_DISABLE)
 				If Not $bSuspended Then
-					GUICtrlSetState($hUpdate, $GUI_DISABLE)
+					GUICtrlSetState($hExclude, $GUI_DISABLE)
 					GUICtrlSetState($hServices, $GUI_DISABLE)
 					GUICtrlSetState($hAggressive, $GUI_DISABLE)
 					GUICtrlSetState($hThawCycle, $GUI_DISABLE)
@@ -528,7 +539,7 @@ Func Main()
 					GUICtrlSetState($hThawCycle, $GUI_ENABLE)
 					If _IsChecked($hThawCycle) Then GUICtrlSetState($hThawCycle + 1, $GUI_ENABLE)
 					GUICtrlSetData($hToggle, " FREEZE SYSTEM")
-					GUICtrlSetState($hUpdate, $GUI_ENABLE)
+					GUICtrlSetState($hExclude, $GUI_ENABLE)
 				EndIf
 				GUICtrlSetState($hToggle, $GUI_ENABLE)
 
@@ -570,28 +581,32 @@ Func Main()
 				ShellExecute("https://www.paypal.me/rhsky")
 
 			Case $hUpdate
-				Switch _GetLatestRelease($sVersion)
-					Case -1
-						MsgBox($MB_OK+$MB_ICONWARNING+$MB_TOPMOST, "Test Build?", "You're running a newer build than publically available!")
-					Case 0
-						Switch @error
-							Case 0
-								MsgBox($MB_OK+$MB_ICONINFORMATION+$MB_TOPMOST, "Up to Date", "You're running the latest build!")
-							Case 1
-								MsgBox($MB_OK+$MB_ICONWARNING+$MB_TOPMOST, "Unable to Check for Updates", "Unable to load release data.")
-							Case 2
-								MsgBox($MB_OK+$MB_ICONWARNING+$MB_TOPMOST, "Unable to Check for Updates", "Invalid Data Received!")
-							Case 3
-								Switch @extended
-									Case 0
-										MsgBox($MB_OK+$MB_ICONWARNING+$MB_TOPMOST, "Unable to Check for Updates", "Invalid Release Tags Received!")
-									Case 1
-										MsgBox($MB_OK+$MB_ICONWARNING+$MB_TOPMOST, "Unable to Check for Updates", "Invalid Release Types Received!")
-								EndSwitch
-						EndSwitch
-					Case 1
-						If MsgBox($MB_YESNO+$MB_ICONINFORMATION+$MB_TOPMOST, "Update Available", "An Update is Availabe, would you like to download it?") = $IDYES Then ShellExecute("https://github.com/rcmaehl/FreezeToStock/releases")
-				EndSwitch
+				If $bSuspended Then
+					MsgBox($MB_OK+$MB_ICONWARNING+$MB_TOPMOST, "Unable to Check for Updates", "Please thaw the system to check for updates", 10)
+				Else
+					Switch _GetLatestRelease($sVersion)
+						Case -1
+							MsgBox($MB_OK+$MB_ICONWARNING+$MB_TOPMOST, "Test Build?", "You're running a newer build than publically available!", 10)
+						Case 0
+							Switch @error
+								Case 0
+									MsgBox($MB_OK+$MB_ICONINFORMATION+$MB_TOPMOST, "Up to Date", "You're running the latest build!", 10)
+								Case 1
+									MsgBox($MB_OK+$MB_ICONWARNING+$MB_TOPMOST, "Unable to Check for Updates", "Unable to load release data.", 10)
+								Case 2
+									MsgBox($MB_OK+$MB_ICONWARNING+$MB_TOPMOST, "Unable to Check for Updates", "Invalid Data Received!", 10)
+								Case 3
+									Switch @extended
+										Case 0
+											MsgBox($MB_OK+$MB_ICONWARNING+$MB_TOPMOST, "Unable to Check for Updates", "Invalid Release Tags Received!", 10)
+										Case 1
+											MsgBox($MB_OK+$MB_ICONWARNING+$MB_TOPMOST, "Unable to Check for Updates", "Invalid Release Types Received!", 10)
+									EndSwitch
+							EndSwitch
+						Case 1
+							If MsgBox($MB_YESNO+$MB_ICONINFORMATION+$MB_TOPMOST, "Update Available", "An Update is Availabe, would you like to download it?", 10) = $IDYES Then ShellExecute("https://github.com/rcmaehl/FreezeToStock/releases")
+					EndSwitch
+				EndIf
 
 
 			Case Else
@@ -972,7 +987,7 @@ EndFunc
 ;                  $hOutput             - [optional] Handle of the GUI Console. Default is False, for none.
 ; Return values .: 1                    - An error has occured
 ; Author ........: rcmaehl (Robert Maehl)
-; Modified ......: 09/07/2020
+; Modified ......: 03/05/2021
 ; Remarks .......:
 ; Related .......:
 ; Link ..........:
@@ -981,16 +996,6 @@ EndFunc
 Func _ThawFromStock($aProcessExclusions, $bIncludeServices, $aServicesSnapshot, $bAggressive, $hOutput)
 
 	_GUICtrlStatusBar_SetText($hOutput, "Thawing...", 0)
-
-	$aProcesses = ProcessList()
-	For $iLoop = 0 to $aProcesses[0][0] Step 1
-		If _ArraySearch($aProcessExclusions, $aProcesses[$iLoop][0]) = -1 Then
-			_GUICtrlStatusBar_SetText($hOutput, "Process: " & $aProcesses[$iLoop][0], 1)
-			_ProcessResume($aProcesses[$iLoop][1])
-		Else
-			;;;
-		EndIf
-	Next
 
 	If $bIncludeServices Then
 		Local $hSCM = _SCMStartup()
@@ -1012,6 +1017,16 @@ Func _ThawFromStock($aProcessExclusions, $bIncludeServices, $aServicesSnapshot, 
 		Next
 		_SCMShutdown($hSCM)
 	EndIf
+
+	$aProcesses = ProcessList()
+	For $iLoop = 0 to $aProcesses[0][0] Step 1
+		If _ArraySearch($aProcessExclusions, $aProcesses[$iLoop][0]) = -1 Then
+			_GUICtrlStatusBar_SetText($hOutput, "Process: " & $aProcesses[$iLoop][0], 1)
+			_ProcessResume($aProcesses[$iLoop][1])
+		Else
+			;;;
+		EndIf
+	Next
 
 	_GUICtrlStatusBar_SetText($hOutput, "", 0)
 	_GUICtrlStatusBar_SetText($hOutput, "", 1)
