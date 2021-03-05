@@ -129,6 +129,7 @@ Func Main()
 			Local $hFirefox = GUICtrlCreateMenuItem("Firefox", $hBrowsers)
 			Local $hMSIE = GUICtrlCreateMenuItem("IE", $hBrowsers)
 			Local $hOpera = GUICtrlCreateMenuItem("Opera", $hBrowsers)
+			Local $hPale = GUICtrlCreateMenuItem("Pale Moon", $hBrowsers)
 		Local $hHardware = GUICtrlCreateMenu("Hardware", $hExclude)
 			Local $hCorsiar = GUICtrlCreateMenuItem("Corsair iCUE", $hHardware)
 			Local $hLogi = GUICtrlCreateMenuItem("Logitech", $hHardware)
@@ -249,7 +250,7 @@ Func Main()
 				FileWrite(".\export.csv", "[SERVICES]" & @CRLF)
 				FileWrite(".\export.csv", _ArrayToString(_ServicesList(), ",") & @CRLF)
 
-			Case $hBE, $hEAC, $hAMD To $hXSplit, $hChrome to $hOpera, $hCorsiar to $hMSMK, $hEpik to $hXbox, $hDiscord to $hTelegram, $hMSPT to $hTStop, $hOculus To $hWinMR
+			Case $hBE, $hEAC, $hAMD To $hXSplit, $hChrome to $hPale, $hCorsiar to $hMSMK, $hEpik to $hXbox, $hDiscord to $hTelegram, $hMSPT to $hTStop, $hOculus To $hWinMR
 				If _IsChecked($hMsg) Then
 					GUICtrlSetState($hMsg, $GUI_UNCHECKED)
 					Switch $hMsg
@@ -316,6 +317,9 @@ Func Main()
 							_ArrayRemove($aProcessExclusions, "iexplore.exe")
 						Case $hOpera
 							_ArrayRemove($aProcessExclusions, "opera.exe")
+						Case $hPale
+							_ArrayRemove($aProcessExclusions, "palemoon.exe")
+							_ArrayRemove($aProcessExclusions, "plugin-container.exe")
 						Case $hCorsiar
 							_ArrayRemove($aProcessExclusions, "Corsair.Service.CpuIdRemote64.exe")
 							_ArrayRemove($aProcessExclusions, "Corsair.Service.DisplayAdapter.exe")
@@ -454,6 +458,9 @@ Func Main()
 							_ArrayAdd($aProcessExclusions, "iexplore.exe")
 						Case $hOpera
 							_ArrayAdd($aProcessExclusions, "opera.exe")
+						Case $hPale
+							_ArrayAdd($aProcessExclusions, "palemoon.exe")
+							_ArrayAdd($aProcessExclusions, "plugin-container.exe")
 						Case $hCorsiar
 							_ArrayAdd($aProcessExclusions, "Corsair.Service.CpuIdRemote64.exe")
 							_ArrayAdd($aProcessExclusions, "Corsair.Service.DisplayAdapter.exe")
