@@ -564,7 +564,6 @@ Func Main()
 			Case $hToggle
 				GUICtrlSetState($hToggle, $GUI_DISABLE)
 				If Not $bSuspended Then
-					GUICtrlSetState($hExclude, $GUI_DISABLE)
 					GUICtrlSetState($hServices, $GUI_DISABLE)
 					GUICtrlSetState($hAggressive, $GUI_DISABLE)
 					GUICtrlSetState($hThawCycle, $GUI_DISABLE)
@@ -581,7 +580,6 @@ Func Main()
 					GUICtrlSetState($hThawCycle, $GUI_ENABLE)
 					If _IsChecked($hThawCycle) Then GUICtrlSetState($hThawCycle + 1, $GUI_ENABLE)
 					GUICtrlSetData($hToggle, " FREEZE SYSTEM")
-					GUICtrlSetState($hExclude, $GUI_ENABLE)
 				EndIf
 				GUICtrlSetState($hToggle, $GUI_ENABLE)
 
@@ -686,7 +684,7 @@ EndFunc
 ;                  $hOutput             - Handle of the GUI Console
 ; Return values .: 1                    - An error has occured
 ; Author ........: rcmaehl (Robert Maehl)
-; Modified ......: 09/07/2020
+; Modified ......: 03/05/2021
 ; Remarks .......:
 ; Related .......:
 ; Link ..........:
