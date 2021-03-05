@@ -564,6 +564,7 @@ Func Main()
 			Case $hToggle
 				GUICtrlSetState($hToggle, $GUI_DISABLE)
 				If Not $bSuspended Then
+					If Not _IsChecked($hThawCycle) Then GUICtrlSetState($hExclude, $GUI_DISABLE)
 					GUICtrlSetState($hServices, $GUI_DISABLE)
 					GUICtrlSetState($hAggressive, $GUI_DISABLE)
 					GUICtrlSetState($hThawCycle, $GUI_DISABLE)
@@ -580,6 +581,7 @@ Func Main()
 					GUICtrlSetState($hThawCycle, $GUI_ENABLE)
 					If _IsChecked($hThawCycle) Then GUICtrlSetState($hThawCycle + 1, $GUI_ENABLE)
 					GUICtrlSetData($hToggle, " FREEZE SYSTEM")
+					GUICtrlSetState($hExclude, $GUI_ENABLE)
 				EndIf
 				GUICtrlSetState($hToggle, $GUI_ENABLE)
 
