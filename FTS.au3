@@ -320,6 +320,7 @@ Func Main()
 						Case $hPale
 							_ArrayRemove($aProcessExclusions, "palemoon.exe")
 							_ArrayRemove($aProcessExclusions, "plugin-container.exe")
+							_ArrayRemove($aProcessExclusions, "plugin-hang-ui.exe")
 						Case $hCorsiar
 							_ArrayRemove($aProcessExclusions, "Corsair.Service.CpuIdRemote64.exe")
 							_ArrayRemove($aProcessExclusions, "Corsair.Service.DisplayAdapter.exe")
@@ -461,6 +462,7 @@ Func Main()
 						Case $hPale
 							_ArrayAdd($aProcessExclusions, "palemoon.exe")
 							_ArrayAdd($aProcessExclusions, "plugin-container.exe")
+							_ArrayAdd($aProcessExclusions, "plugin-hang-ui.exe")
 						Case $hCorsiar
 							_ArrayAdd($aProcessExclusions, "Corsair.Service.CpuIdRemote64.exe")
 							_ArrayAdd($aProcessExclusions, "Corsair.Service.DisplayAdapter.exe")
