@@ -78,8 +78,13 @@ Func Main()
 				Case $IDYES
 					If FileReadLine(".frozen", 2) = "True" Then
 						$aServicesSnapshot = _ReadStateFile()
-						_ThawFromStock("", True, $aServicesSnapshot, False, "")
-						_ThawFromStock("", True, $aServicesSnapshot, True, "")
+						If $aServicesSnapshot = False Then
+							MsgBox($MB_OK+$MB_ICONERROR+$MB_TOPMOST, "State File could not be recovered", "Unable to recover previous system state. A computer reboot is highly recommended.")
+							Exit 1
+						Else
+							_ThawFromStock("", True, $aServicesSnapshot, False, "")
+							_ThawFromStock("", True, $aServicesSnapshot, True, "")
+						EndIf
 					Else
 						_ThawFromStock("", False, "", False, "")
 					EndIf
@@ -970,6 +975,14 @@ Func _ProcessResume($iPID)
 EndFunc
 
 Func _ReadStateFile()
+	Local $aFullArray
+	_FileWriteToLine(".frozen", 1, ",", True) ; Replace Date
+	_FileWriteToLine(".frozen", 2, ",", True) ; Replace "True"
+	_FileReadToArray(".frozen", $aFullArray, 0, ",") ; Convert to 2D array
+	If @error Then Return False
+	_ArrayDelete($aFullArray, 0) ; Remove Empty Element
+	_ArrayDelete($aFullArray, 0) ; Remove Empty Element
+	Return $aFullArray
 EndFunc
 
 Func _RemoveStateFile()
