@@ -5,8 +5,8 @@
 #AutoIt3Wrapper_UseX64=y
 #AutoIt3Wrapper_Res_Comment=Compiled 03/05/2021 @ ~17:30 EST
 #AutoIt3Wrapper_Res_Description=Freeze To Stock
-#AutoIt3Wrapper_Res_Fileversion=1.2.2
-#AutoIt3Wrapper_Res_ProductVersion=1.2.2
+#AutoIt3Wrapper_Res_Fileversion=1.3.0
+#AutoIt3Wrapper_Res_ProductVersion=1.3.0
 #AutoIt3Wrapper_Res_LegalCopyright=Robert Maehl, using LGPL 3 License
 #AutoIt3Wrapper_Res_Language=1033
 #AutoIt3Wrapper_Res_requestedExecutionLevel=highestAvailable
@@ -39,7 +39,7 @@ Main()
 
 Func Main()
 
-	Local $sVersion = "1.2.2"
+	Local $sVersion = "1.3.0"
 
 	Local $aStatusSize[2] = [75, -1]
 
@@ -103,9 +103,9 @@ Func Main()
 	Local $hGUI = GUICreate("FreezeToStock", 320, 240, -1, -1, BitOr($WS_MINIMIZEBOX, $WS_CAPTION, $WS_SYSMENU))
 
 	Local $hFile = GUICtrlCreateMenu("File")
-		Local $hDebug  = GUICtrlCreateMenu("Recovery", $hFile)
-			Local $hThawAll = GUICtrlCreateMenuItem("Thaw All", $hDebug)
-			Local $hThawProc = GUICtrlCreateMenuItem("Thaw Processes", $hDebug)
+;		Local $hDebug  = GUICtrlCreateMenu("Recovery", $hFile)
+;			Local $hThawAll = GUICtrlCreateMenuItem("Thaw All", $hDebug)
+;			Local $hThawProc = GUICtrlCreateMenuItem("Thaw Processes", $hDebug)
 		Local $hExport = GUICtrlCreateMenuItem("Export", $hFile)
 		GUICtrlCreateMenuItem("", $hFile)
 		Local $hQuit = GUICtrlCreateMenuItem("Quit", $hFile)
@@ -240,13 +240,6 @@ Func Main()
 				_GUICtrlStatusBar_Destroy($hGUI)
 				GUIDelete($hGUI)
 				Exit
-
-			Case $hThawProc
-				_ThawFromStock($aProcessExclusions, False, "", False, $hStatus)
-
-			Case $hThawAll
-				_ThawFromStock($aProcessExclusions, True, "", False, $hStatus)
-				_ThawFromStock($aProcessExclusions, True, "", True, $hStatus)
 
 			Case $hExport
 				FileDelete(".\export.csv")
@@ -838,7 +831,7 @@ Func _FreezeToStock($aProcessExclusions, $bIncludeServices, $aServicesExclusions
 		EndIf
 	Next
 
-	FileWrite(".frozen", @HOUR & ":" & @MIN & " - " & @MDAY & "/" & @MON & "/" & @YEAR)
+	FileWrite(".frozen", @HOUR & ":" & @MIN & " - " & @MDAY & "/" & @MON & "/" & @YEAR & @CRLF)
 
 	If $bIncludeServices Then
 		Local $hSCM = _SCMStartup()
