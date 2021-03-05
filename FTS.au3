@@ -141,6 +141,7 @@ Func Main()
 			Local $hXbox = GUICtrlCreateMenuItem("Xbox", $hLaunchers)
 		Local $hSocial = GUICtrlCreateMenu("Social", $hExclude)
 			Local $hDiscord = GUICtrlCreateMenuItem("Discord", $hSocial)
+			Local $hTelegram = GUICtrlCreateMenuItem("Telegram", $hSocial)
 		Local $hTools = GUICtrlCreateMenu("Tools", $hExclude)
 			Local $hMSPT = GUICtrlCreateMenuItem("Microsoft Powertoys", $hTools)
 			Local $hNBFC = GUICtrlCreateMenuItem("NoteBook FanControl", $hTools)
@@ -248,7 +249,7 @@ Func Main()
 				FileWrite(".\export.csv", "[SERVICES]" & @CRLF)
 				FileWrite(".\export.csv", _ArrayToString(_ServicesList(), ",") & @CRLF)
 
-			Case $hBE, $hEAC, $hAMD To $hXSplit, $hChrome to $hOpera, $hCorsiar to $hMSMK, $hEpik to $hXbox, $hDiscord, $hMSPT to $hTStop, $hOculus To $hWinMR
+			Case $hBE, $hEAC, $hAMD To $hXSplit, $hChrome to $hOpera, $hCorsiar to $hMSMK, $hEpik to $hXbox, $hDiscord to $hTelegram, $hMSPT to $hTStop, $hOculus To $hWinMR
 				If _IsChecked($hMsg) Then
 					GUICtrlSetState($hMsg, $GUI_UNCHECKED)
 					Switch $hMsg
@@ -351,6 +352,8 @@ Func Main()
 							_ArrayRemove($aServicesExclusions, "XboxNetApiSvc")
 						Case $hDiscord
 							_ArrayRemove($aProcessExclusions, "Discord.exe")
+						Case $hTelegram
+							_ArrayRemove($aProcessExclusions, "Telegram.exe")
 						Case $hMSPT
 							_ArrayRemove($aProcessExclusions, "PowerToys.exe")
 							_ArrayRemove($aProcessExclusions, "PowerToysSettings.exe")
@@ -487,6 +490,8 @@ Func Main()
 							_ArrayAdd($aServicesExclusions, "XboxNetApiSvc")
 						Case $hDiscord
 							_ArrayAdd($aProcessExclusions, "Discord.exe")
+						Case $hTelegram
+							_ArrayAdd($aProcessExclusions, "Telegram.exe")
 						Case $hMSPT
 							_ArrayAdd($aProcessExclusions, "PowerToys.exe")
 							_ArrayAdd($aProcessExclusions, "PowerToysSettings.exe")
