@@ -3,10 +3,10 @@
 #AutoIt3Wrapper_Version=Beta
 #AutoIt3Wrapper_Icon=.\icon.ico
 #AutoIt3Wrapper_UseX64=y
-#AutoIt3Wrapper_Res_Comment=Compiled 12/12/2020 @ ~1:35 EST
+#AutoIt3Wrapper_Res_Comment=Compiled 03/05/2021 @ ~12:15 EST
 #AutoIt3Wrapper_Res_Description=Freeze To Stock
-#AutoIt3Wrapper_Res_Fileversion=1.2.1
-#AutoIt3Wrapper_Res_ProductVersion=1.2.1
+#AutoIt3Wrapper_Res_Fileversion=1.2.2
+#AutoIt3Wrapper_Res_ProductVersion=1.2.2
 #AutoIt3Wrapper_Res_LegalCopyright=Robert Maehl, using LGPL 3 License
 #AutoIt3Wrapper_Res_Language=1033
 #AutoIt3Wrapper_Res_requestedExecutionLevel=highestAvailable
@@ -511,6 +511,7 @@ Func Main()
 			Case $hToggle
 				GUICtrlSetState($hToggle, $GUI_DISABLE)
 				If Not $bSuspended Then
+					GUICtrlSetState($hUpdate, $GUI_DISABLE)
 					GUICtrlSetState($hServices, $GUI_DISABLE)
 					GUICtrlSetState($hAggressive, $GUI_DISABLE)
 					GUICtrlSetState($hThawCycle, $GUI_DISABLE)
@@ -527,6 +528,7 @@ Func Main()
 					GUICtrlSetState($hThawCycle, $GUI_ENABLE)
 					If _IsChecked($hThawCycle) Then GUICtrlSetState($hThawCycle + 1, $GUI_ENABLE)
 					GUICtrlSetData($hToggle, " FREEZE SYSTEM")
+					GUICtrlSetState($hUpdate, $GUI_ENABLE)
 				EndIf
 				GUICtrlSetState($hToggle, $GUI_ENABLE)
 
