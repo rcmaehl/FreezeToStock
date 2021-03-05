@@ -3,7 +3,7 @@
 #AutoIt3Wrapper_Version=Beta
 #AutoIt3Wrapper_Icon=.\icon.ico
 #AutoIt3Wrapper_UseX64=y
-#AutoIt3Wrapper_Res_Comment=Compiled 03/05/2021 @ ~12:15 EST
+#AutoIt3Wrapper_Res_Comment=Compiled 03/05/2021 @ ~17:30 EST
 #AutoIt3Wrapper_Res_Description=Freeze To Stock
 #AutoIt3Wrapper_Res_Fileversion=1.2.2
 #AutoIt3Wrapper_Res_ProductVersion=1.2.2
@@ -39,9 +39,20 @@ Main()
 
 Func Main()
 
-	Local $hState = _GetStateFile()
+	Local $sVersion = "1.2.2"
 
-	ConsoleWrite($hState & @CRLF)
+	Local $aStatusSize[2] = [75, -1]
+
+	Local $bSuspended = False
+	Local $hActive, $hLastActive
+	Local $hFreezeTimer, $bThawing = False, $hThawTimer
+
+	Local $aAfter, $aBefore, $aFinal[0]
+
+	Local $aServicesSnapshot
+	Local $aProcessExclusions[0], $aServicesExclusions[0]
+
+	Local $hState = _GetStateFile()
 
 	Switch $hState
 
@@ -65,7 +76,13 @@ Func Main()
 				"To exit immediately and take other action, choose Cancel.")
 
 				Case $IDYES
-					_ReadStateFile()
+					If FileReadLine(".frozen", 2) = "True" Then
+						$aServicesSnapshot = _ReadStateFile()
+						_ThawFromStock("", True, $aServicesSnapshot, False, "")
+						_ThawFromStock("", True, $aServicesSnapshot, True, "")
+					Else
+						_ThawFromStock("", False, "", False, "")
+					EndIf
 
 				Case $IDNO
 					_RemoveStateFile()
@@ -77,20 +94,6 @@ Func Main()
 			EndSwitch
 
 	EndSwitch
-
-
-	Local $sVersion = "1.2.1"
-
-	Local $aStatusSize[2] = [75, -1]
-
-	Local $bSuspended = False
-	Local $hActive, $hLastActive
-	Local $hFreezeTimer, $bThawing = False, $hThawTimer
-
-	Local $aAfter, $aBefore, $aFinal[0]
-
-	Local $aServicesSnapshot
-	Local $aProcessExclusions[0], $aServicesExclusions[0]
 
 	Local $hGUI = GUICreate("FreezeToStock", 320, 240, -1, -1, BitOr($WS_MINIMIZEBOX, $WS_CAPTION, $WS_SYSMENU))
 
@@ -235,7 +238,6 @@ Func Main()
 
 			Case $hThawProc
 				_ThawFromStock($aProcessExclusions, False, "", False, $hStatus)
-				_ThawFromStock($aProcessExclusions, False, "", True, $hStatus)
 
 			Case $hThawAll
 				_ThawFromStock($aProcessExclusions, True, "", False, $hStatus)
@@ -355,6 +357,7 @@ Func Main()
 							_ArrayRemove($aProcessExclusions, "PowerToys.exe")
 							_ArrayRemove($aProcessExclusions, "PowerToysSettings.exe")
 							_ArrayRemove($aProcessExclusions, "ColorPicker.exe")
+							_ArrayRemove($aProcessExclusions, "ColorPickerUI.exe")
 							_ArrayRemove($aProcessExclusions, "FancyZonesEditor.exe")
 							_ArrayRemove($aProcessExclusions, "ImageResizer.exe")
 							_ArrayRemove($aProcessExclusions, "PowerLauncher.exe")
@@ -490,6 +493,7 @@ Func Main()
 							_ArrayAdd($aProcessExclusions, "PowerToys.exe")
 							_ArrayAdd($aProcessExclusions, "PowerToysSettings.exe")
 							_ArrayAdd($aProcessExclusions, "ColorPicker.exe")
+							_ArrayAdd($aProcessExclusions, "ColorPickerUI.exe")
 							_ArrayAdd($aProcessExclusions, "FancyZonesEditor.exe")
 							_ArrayAdd($aProcessExclusions, "ImageResizer.exe")
 							_ArrayAdd($aProcessExclusions, "PowerLauncher.exe")
@@ -829,6 +833,8 @@ Func _FreezeToStock($aProcessExclusions, $bIncludeServices, $aServicesExclusions
 		EndIf
 	Next
 
+	FileWrite(".frozen", @HOUR & ":" & @MIN & " - " & @MDAY & "/" & @MON & "/" & @YEAR)
+
 	If $bIncludeServices Then
 		Local $hSCM = _SCMStartup()
 		$aServices = _ServicesList()
@@ -851,6 +857,8 @@ Func _FreezeToStock($aProcessExclusions, $bIncludeServices, $aServicesExclusions
 			Next
 		Next
 		_SCMShutdown($hSCM)
+		FileWrite(".frozen", "True" & @CRLF)
+		FileWrite(".frozen", _ArrayToString($aServices, ","))
 	EndIf
 
 	_GUICtrlStatusBar_SetText($hOutput, "", 0)
