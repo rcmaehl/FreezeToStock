@@ -628,7 +628,7 @@ Func Main()
 					Next
 				EndIf
 			Case $hGithub
-				ShellExecute("https://github.com/rcmaehl/FreezeToStock")
+				ShellExecute("https://fcofix.org/FreezeToStock")
 
 			Case $hDisWeb
 				ShellExecute("https://discord.gg/uBnBcBx")
@@ -660,7 +660,7 @@ Func Main()
 									EndSwitch
 							EndSwitch
 						Case 1
-							If MsgBox($MB_YESNO+$MB_ICONINFORMATION+$MB_TOPMOST, "Update Available", "An Update is Availabe, would you like to download it?", 10) = $IDYES Then ShellExecute("https://github.com/rcmaehl/FreezeToStock/releases")
+							If MsgBox($MB_YESNO+$MB_ICONINFORMATION+$MB_TOPMOST, "Update Available", "An Update is Availabe, would you like to download it?", 10) = $IDYES Then ShellExecute("https://fcofix.org/FreezeToStock/releases")
 					EndSwitch
 				EndIf
 
@@ -883,7 +883,7 @@ Func _GetLatestRelease($sCurrent)
 	Local $dAPIBin
 	Local $sAPIJSON
 
-	$dAPIBin = InetRead("https://api.github.com/repos/rcmaehl/FreezeToStock/releases")
+	$dAPIBin = InetRead("https://api.fcofix.org/repos/rcmaehl/FreezeToStock/releases")
 	If @error Then Return SetError(1, 0, 0)
 	$sAPIJSON = BinaryToString($dAPIBin)
 	If @error Then Return SetError(2, 0, 0)
