@@ -54,6 +54,7 @@ Func Main()
 
 	Local $hState = _GetStateFile()
 
+	FileSetAttrib(".frozen", "-H")
 	Switch $hState
 
 		Case False
@@ -872,6 +873,7 @@ Func _FreezeToStock($aProcessExclusions, $bIncludeServices, $aServicesExclusions
 		FileWrite(".frozen", "True" & @CRLF)
 		FileWrite(".frozen", _ArrayToString($aServices, ","))
 	EndIf
+	FileSetAttrib(".frozen", "+H")
 
 	_GUICtrlStatusBar_SetText($hOutput, "", 0)
 	_GUICtrlStatusBar_SetText($hOutput, "", 1)
