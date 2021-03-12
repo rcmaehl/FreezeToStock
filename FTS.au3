@@ -5,12 +5,12 @@
 #AutoIt3Wrapper_UseX64=y
 #AutoIt3Wrapper_Res_Comment=Compiled 03/05/2021 @ ~17:30 EST
 #AutoIt3Wrapper_Res_Description=Freeze To Stock
-#AutoIt3Wrapper_Res_Icon_Add=.\includes\freeze_small.ico
-#AutoIt3Wrapper_Res_Fileversion=1.3.0
-#AutoIt3Wrapper_Res_ProductVersion=1.3.0
+#AutoIt3Wrapper_Res_Fileversion=1.3.1.0
+#AutoIt3Wrapper_Res_ProductVersion=1.3.1
 #AutoIt3Wrapper_Res_LegalCopyright=Robert Maehl, using LGPL 3 License
 #AutoIt3Wrapper_Res_Language=1033
 #AutoIt3Wrapper_Res_requestedExecutionLevel=highestAvailable
+#AutoIt3Wrapper_Res_Icon_Add=includes\freeze_small.ico
 #AutoIt3Wrapper_Run_Au3Stripper=y
 #Au3Stripper_Parameters=/pe /so
 #EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
@@ -172,9 +172,9 @@ Func Main()
 		Local $hToggle = GUICtrlCreateButton(" FREEZE SYSTEM", 10, 20, 300, 60)
 			GUICtrlSetFont(-1, 20)
 			If @Compiled Then
-				GUICtrlSetImage(-1, @ScriptFullPath, 201, 0)
+				GUICtrlSetImage(-1, @ScriptFullPath, 201, 1)
 			Else
-				GUICtrlSetImage(-1, ".\Includes\freeze_small.ico", -1, 0)
+				GUICtrlSetImage(-1, ".\Includes\freeze_small.ico", -1, 1)
 			EndIf
 
 		Local $hServices = GUICtrlCreateCheckbox("Freeze Services as well as Processes", 12, 85, 296, 15)
