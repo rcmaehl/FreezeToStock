@@ -5,6 +5,7 @@
 #AutoIt3Wrapper_UseX64=y
 #AutoIt3Wrapper_Res_Comment=Compiled 03/05/2021 @ ~17:30 EST
 #AutoIt3Wrapper_Res_Description=Freeze To Stock
+#AutoIt3Wrapper_Res_Icon_Add=.\includes\freeze_small.ico
 #AutoIt3Wrapper_Res_Fileversion=1.3.0
 #AutoIt3Wrapper_Res_ProductVersion=1.3.0
 #AutoIt3Wrapper_Res_LegalCopyright=Robert Maehl, using LGPL 3 License
@@ -170,7 +171,11 @@ Func Main()
 	GUICtrlCreateGroup("Options", 5, 5, 310, 190)
 		Local $hToggle = GUICtrlCreateButton(" FREEZE SYSTEM", 10, 20, 300, 60)
 			GUICtrlSetFont(-1, 20)
-			GUICtrlSetImage(-1, ".\Includes\freeze_small.ico", -1, 0)
+			If @Compiled Then
+				GUICtrlSetImage(-1, @ScriptFullPath, 201, 0)
+			Else
+				GUICtrlSetImage(-1, ".\Includes\freeze_small.ico", -1, 0)
+			EndIf
 
 		Local $hServices = GUICtrlCreateCheckbox("Freeze Services as well as Processes", 12, 85, 296, 15)
 			GUICtrlSetTip(-1, "This Pauses known unneeded System Services")
