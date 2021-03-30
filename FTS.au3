@@ -40,7 +40,7 @@ Main()
 
 Func Main()
 
-	Local $sVersion = "1.3.0"
+	Local $sVersion = "1.3.1"
 
 	Local $aStatusSize[2] = [75, -1]
 
@@ -136,6 +136,7 @@ Func Main()
 			Local $hCorsiar = GUICtrlCreateMenuItem("Corsair iCUE", $hHardware)
 			Local $hLogi = GUICtrlCreateMenuItem("Logitech", $hHardware)
 			Local $hMSMK = GUICtrlCreateMenuItem("Microsft Mouse && Keyboard", $hHardware)
+			Local $hTouch = GUICtrlCreateMenuItem("Microsft Touch Keyboard", $hHardware)
 		Local $hLaunchers = GUICtrlCreateMenu("Launchers", $hExclude)
 			Local $hEpik = GUICtrlCreateMenuItem("Epic Games", $hLaunchers)
 			Local $hParsec = GUICtrlCreateMenuItem("Parsec", $hLaunchers)
@@ -256,7 +257,7 @@ Func Main()
 				FileWrite(".\export.csv", "[SERVICES]" & @CRLF)
 				FileWrite(".\export.csv", _ArrayToString(_ServicesList(), ",") & @CRLF)
 
-			Case $hBE, $hEAC, $hAMD To $hXSplit, $hChrome to $hPale, $hCorsiar to $hMSMK, $hEpik to $hXbox, $hDiscord to $hTelegram, $hMSPT to $hTStop, $hOculus To $hWinMR
+			Case $hBE, $hEAC, $hAMD To $hXSplit, $hChrome to $hPale, $hCorsiar to $hTouch, $hEpik to $hXbox, $hDiscord to $hTelegram, $hMSPT to $hTStop, $hOculus To $hWinMR
 				If _IsChecked($hMsg) Then
 					GUICtrlSetState($hMsg, $GUI_UNCHECKED)
 					Switch $hMsg
@@ -342,6 +343,9 @@ Func Main()
 							_ArrayRemove($aProcessExclusions, "MKCHelper.exe")
 							_ArrayRemove($aProcessExclusions, "ipoint.exe")
 							_ArrayRemove($aProcessExclusions, "itype.exe")
+						Case $hTouch
+							_ArrayRemove($aProcessExclusions, "TabTib.exe")
+							_ArrayRemove($aServicesExclusions, "TabletInputService")
 						Case $hEpik
 							_ArrayRemove($aProcessExclusions, "EpicGamesLauncher.exe")
 						Case $hParsec
@@ -484,6 +488,9 @@ Func Main()
 							_ArrayAdd($aProcessExclusions, "MKCHelper.exe")
 							_ArrayAdd($aProcessExclusions, "ipoint.exe")
 							_ArrayAdd($aProcessExclusions, "itype.exe")
+						Case $hTouch
+							_ArrayAdd($aProcessExclusions, "TabTib.exe")
+							_ArrayAdd($aServicesExclusions, "TabletInputService")
 						Case $hEpik
 							_ArrayAdd($aProcessExclusions, "EpicGamesLauncher.exe")
 						Case $hParsec
