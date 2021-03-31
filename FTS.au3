@@ -246,9 +246,13 @@ Func Main()
 		Switch $hMsg
 
 			Case $GUI_EVENT_CLOSE
-				_GUICtrlStatusBar_Destroy($hGUI)
-				GUIDelete($hGUI)
-				Exit
+				If $bSuspended Then
+					WinSetState($hGUI, "", @SW_MINIMIZE)
+				Else
+					_GUICtrlStatusBar_Destroy($hGUI)
+					GUIDelete($hGUI)
+					Exit
+				EndIf
 
 			Case $hExport
 				FileDelete(".\export.csv")
