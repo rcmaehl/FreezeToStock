@@ -23,7 +23,8 @@ jobs:
     - name: Compile
       run: |
            dir
-           C:\"Program Files (x86)"\AutoIt3\AutoIt3.exe "C:\Program Files (x86)\AutoIt3\SciTE\AutoIt3Wrapper\AutoIt3Wrapper.au3" /NoStatus /prod /in ".\FreezeToStock\FTS.au3"
+           cd FreezeToStock
+           C:\"Program Files (x86)"\AutoIt3\AutoIt3.exe "C:\Program Files (x86)\AutoIt3\SciTE\AutoIt3Wrapper\AutoIt3Wrapper.au3" /NoStatus /prod /in ".\FTS.au3"
            Start-Sleep -s 10
 
     - name: Upload
