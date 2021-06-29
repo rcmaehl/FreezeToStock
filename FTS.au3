@@ -15,6 +15,8 @@
 #Au3Stripper_Parameters=/pe /so
 #EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
 
+FileChangeDir(@SystemDir)
+
 ; Included in AutoIt
 #include <File.au3>
 #include <Misc.au3>
